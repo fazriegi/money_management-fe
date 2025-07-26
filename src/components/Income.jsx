@@ -62,11 +62,16 @@ export default function Income() {
   };
 
   const onSave = () => {
-    setIsEdit((prev) => !prev);
-    form.validateFields().then((values) => {
-      console.log("All rows:", values.income);
-      setMasterDataTemp({ data: values.income, total: totalIncome });
-    });
+    form
+      .validateFields()
+      .then((values) => {
+        console.log("All rows:", values.income);
+        setMasterDataTemp({ data: values.income, total: totalIncome });
+        setIsEdit((prev) => !prev);
+      })
+      .catch((errorInfo) => {
+        form.scrollToField(errorInfo.errorFields[0].name);
+      });
   };
 
   const onCancel = () => {
@@ -135,6 +140,7 @@ export default function Income() {
                     <Form.Item
                       name={[record._idx, "type"]}
                       style={{ margin: 0 }}
+                      rules={[{ required: true, message: "" }]}
                     >
                       <Select
                         style={{ width: "100%" }}
@@ -162,6 +168,7 @@ export default function Income() {
                     <Form.Item
                       name={[record._idx, "name"]}
                       style={{ margin: 0 }}
+                      rules={[{ required: true, message: "" }]}
                     >
                       <Input
                         style={{ width: "100%" }}
@@ -179,6 +186,7 @@ export default function Income() {
                     <Form.Item
                       name={[record._idx, "value"]}
                       style={{ margin: 0 }}
+                      rules={[{ required: true, message: "" }]}
                     >
                       <InputCurrency
                         style={{ width: "100%" }}
