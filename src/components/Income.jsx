@@ -32,6 +32,7 @@ export default function Income() {
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
   const [totalIncome, setTotalIncome] = useState(0);
+  const [masterDataTemp, setMasterDataTemp] = useState({});
 
   const deleteRow = (key) => {
     const data = form.getFieldValue("income") || [];
@@ -64,28 +65,39 @@ export default function Income() {
     setIsEdit((prev) => !prev);
     form.validateFields().then((values) => {
       console.log("All rows:", values.income);
+      setMasterDataTemp({ data: values.income, total: totalIncome });
     });
   };
 
+  const onCancel = () => {
+    setIsEdit((prev) => !prev);
+    form.setFieldsValue({ income: masterDataTemp?.data });
+    setTotalIncome(masterDataTemp?.total);
+  };
+
   const extraButton = [
-    // if isEdit is true, this will be the Save button element; otherwise it’s false
-    isEdit && (
-      <Button key="save" type="primary" onClick={onSave}>
-        Save
+    ...(isEdit
+      ? [
+          <Button key="save" type="primary" onClick={onSave}>
+            Save
+          </Button>,
+          <Button key="cancel" onClick={onCancel}>
+            Cancel
+          </Button>,
+        ]
+      : []),
+
+    !isEdit && (
+      <Button key="edit" onClick={() => setIsEdit((prev) => !prev)}>
+        Edit
       </Button>
     ),
-
-    // always include the Edit button
-    <Button key="edit" onClick={() => setIsEdit((prev) => !prev)}>
-      {isEdit ? "Cancel" : "Edit"}
-    </Button>,
-  ]
-    // then strip out any “false” entries:
-    .filter(Boolean);
+  ].filter(Boolean);
 
   useEffect(() => {
     form.setFieldsValue({ income: dataIncome });
     const total = Calculate(dataIncome);
+    setMasterDataTemp({ data: dataIncome, total });
     setTotalIncome(total);
   }, []);
 
