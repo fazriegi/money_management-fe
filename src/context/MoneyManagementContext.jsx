@@ -6,12 +6,15 @@ export const MoneyManagementContext = createContext({});
 export const MoneyManagementProvider = ({ children }) => {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
+  const [totalCashflow, setTotalCashflow] = useState(0);
 
   const value = {
     totalIncome,
     totalExpense,
     setTotalIncome,
     setTotalExpense,
+    totalCashflow,
+    setTotalCashflow,
   };
 
   return (
