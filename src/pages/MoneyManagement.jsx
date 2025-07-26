@@ -6,6 +6,8 @@ import Income from "../components/Income";
 import Expenditure from "../components/Expenditure";
 import InputCurrency from "../components/InputCurrency";
 import { useMoneyManagementContext } from "../context/MoneyManagementContext";
+import Asset from "../components/Asset";
+import Liability from "../components/Liability";
 
 const MoneyManagement = () => {
   const [period, setPeriod] = useState("");
@@ -90,6 +92,7 @@ const MoneyManagement = () => {
           <h2 style={{ fontWeight: "bold" }}>Balance Sheet</h2>
           <div style={{ display: "flex", gap: 20, border: "1px solid blue" }}>
             <Asset />
+            <Liability />
           </div>
         </div>
       </section>
