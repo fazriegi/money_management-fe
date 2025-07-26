@@ -16,7 +16,7 @@ const InputCurrency = ({
         ...props?.style,
       }}
     >
-      {label !== "" && <h3 style={{ margin: 0, lineHeight: 1.5 }}>{label}</h3>}
+      {label !== "" && <h4 style={{ margin: 0, lineHeight: 1.5 }}>{label}</h4>}
       <div style={{ flex: 1 }}>
         <InputNumber
           {...props}

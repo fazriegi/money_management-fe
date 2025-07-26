@@ -73,6 +73,7 @@ const MoneyManagement = () => {
           format="MMM YYYY"
           onChange={changeDate}
           defaultValue={today}
+          allowClear={false}
         />
         <Period period={period} />
       </header>
