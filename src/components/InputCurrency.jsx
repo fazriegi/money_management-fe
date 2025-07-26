@@ -1,5 +1,5 @@
 import { InputNumber } from "antd";
-import { CURRENCY } from "../constant/Constant";
+import { CURRENCY, FORMATNUMBER } from "../constant/Constant";
 
 const InputCurrency = ({
   label = "",
@@ -21,9 +21,7 @@ const InputCurrency = ({
         <InputNumber
           {...props}
           defaultValue={defaultValue}
-          formatter={(value) =>
-            `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-          }
+          formatter={FORMATNUMBER}
           style={{
             width: "100%",
             backgroundColor: "#f9f9f9",

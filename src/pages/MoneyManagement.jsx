@@ -85,6 +85,13 @@ const MoneyManagement = () => {
             value={totalCashflow}
           />
         </div>
+
+        <div id="balance-sheet" style={{ marginTop: "1em" }}>
+          <h2 style={{ fontWeight: "bold" }}>Balance Sheet</h2>
+          <div style={{ display: "flex", gap: 20, border: "1px solid blue" }}>
+            <Asset />
+          </div>
+        </div>
       </section>
     </div>
   );
