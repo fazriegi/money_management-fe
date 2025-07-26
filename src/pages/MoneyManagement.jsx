@@ -11,8 +11,16 @@ import Liability from "../components/Liability";
 
 const MoneyManagement = () => {
   const [period, setPeriod] = useState("");
-  const { totalIncome, totalExpense, totalCashflow, setTotalCashflow } =
-    useMoneyManagementContext();
+  const {
+    totalIncome,
+    totalExpense,
+    totalCashflow,
+    setTotalCashflow,
+    totalAsset,
+    totalLiability,
+    netWorth,
+    setNetWorth,
+  } = useMoneyManagementContext();
 
   const getPeriodDate = (date) => {
     // start period date every 27
@@ -44,6 +52,10 @@ const MoneyManagement = () => {
   useEffect(() => {
     setTotalCashflow(totalIncome - totalExpense);
   }, [totalIncome, totalExpense]);
+
+  useEffect(() => {
+    setNetWorth(totalAsset - totalLiability);
+  }, [totalAsset, totalLiability]);
 
   const changeDate = (date) => {
     const selectedDate = adjustDate(date);
@@ -93,6 +105,20 @@ const MoneyManagement = () => {
           <div style={{ display: "flex", gap: 20, border: "1px solid blue" }}>
             <Asset />
             <Liability />
+          </div>
+          <div
+            style={{
+              backgroundColor: "#fff",
+              width: "30%",
+              margin: "1em auto",
+              padding: "0.5em",
+            }}
+          >
+            <InputCurrency
+              label="Net Worth: "
+              style={{ color: "#000" }}
+              value={netWorth}
+            />
           </div>
         </div>
       </section>

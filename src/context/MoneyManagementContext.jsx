@@ -7,6 +7,9 @@ export const MoneyManagementProvider = ({ children }) => {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
   const [totalCashflow, setTotalCashflow] = useState(0);
+  const [totalAsset, setTotalAsset] = useState(0);
+  const [totalLiability, setTotalLiability] = useState(0);
+  const [netWorth, setNetWorth] = useState(0);
 
   const value = {
     totalIncome,
@@ -15,6 +18,12 @@ export const MoneyManagementProvider = ({ children }) => {
     setTotalExpense,
     totalCashflow,
     setTotalCashflow,
+    totalAsset,
+    setTotalAsset,
+    totalLiability,
+    setTotalLiability,
+    netWorth,
+    setNetWorth,
   };
 
   return (

@@ -7,6 +7,7 @@ import InputCurrency from "../components/InputCurrency";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Calculate } from "../helper/helper";
 import { FORMATNUMBER } from "../constant/Constant";
+import { useMoneyManagementContext } from "../context/MoneyManagementContext";
 
 const data = [
   {
@@ -30,10 +31,11 @@ const data = [
 ];
 
 export default function Asset() {
+  const { totalAsset, setTotalAsset } = useMoneyManagementContext();
+
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
   const [masterDataTemp, setMasterDataTemp] = useState({});
-  const [totalAsset, setTotalAsset] = useState(0);
 
   const deleteRow = (key) => {
     const data = form.getFieldValue("data") || [];

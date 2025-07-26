@@ -6,6 +6,7 @@ import Column from "antd/es/table/Column";
 import InputCurrency from "../components/InputCurrency";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Calculate } from "../helper/helper";
+import { useMoneyManagementContext } from "../context/MoneyManagementContext";
 
 const data = [
   {
@@ -21,10 +22,11 @@ const data = [
 ];
 
 export default function Liability() {
+  const { totalLiability, setTotalLiability } = useMoneyManagementContext();
+
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
   const [masterDataTemp, setMasterDataTemp] = useState({});
-  const [totalLiability, setTotalLiability] = useState(0);
 
   const deleteRow = (key) => {
     const data = form.getFieldValue("data") || [];
