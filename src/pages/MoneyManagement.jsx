@@ -78,10 +78,7 @@ const MoneyManagement = () => {
       </header>
       <section>
         <h2 style={{ fontWeight: "bold" }}>Cashflow</h2>
-        <div
-          id="income-statement"
-          style={{ display: "flex", gap: 20, border: "1px solid blue" }}
-        >
+        <div id="income-statement" style={{ display: "flex", gap: 20 }}>
           <Income />
           <Expenditure />
         </div>
@@ -102,7 +99,7 @@ const MoneyManagement = () => {
 
         <div id="balance-sheet" style={{ marginTop: "1em" }}>
           <h2 style={{ fontWeight: "bold" }}>Balance Sheet</h2>
-          <div style={{ display: "flex", gap: 20, border: "1px solid blue" }}>
+          <div style={{ display: "flex", gap: 20 }}>
             <Asset />
             <Liability />
           </div>
