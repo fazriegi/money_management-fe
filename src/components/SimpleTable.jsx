@@ -33,6 +33,7 @@ export default function SimpleTable({
       style={style}
       title={isUseTitle ? renderTitle : undefined}
       footer={() => footer || undefined}
+      scroll={{ x: "max-content" }}
       {...props}
     >
       {children}
