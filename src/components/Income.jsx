@@ -5,12 +5,13 @@ import SimpleTable from "../components/SimpleTable";
 import Column from "antd/es/table/Column";
 import InputCurrency from "../components/InputCurrency";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { Calculate } from "../helper/helper";
 
 const dataIncome = [
   {
     key: "1",
     name: "Salary",
-    value: "300000",
+    value: 300000,
     type: "passive",
   },
   {
@@ -84,19 +85,9 @@ export default function Income() {
 
   useEffect(() => {
     form.setFieldsValue({ income: dataIncome });
-    calculateTotal();
-  }, []);
-
-  const calculateTotal = () => {
-    const data = form.getFieldValue("income") || [];
-
-    const total = data.reduce((sum, row) => {
-      const numeric = Number(String(row.value).replace(/[^\d.-]/g, "")) || 0;
-      return sum + numeric;
-    }, 0);
-
+    const total = Calculate(dataIncome);
     setTotalIncome(total);
-  };
+  }, []);
 
   return (
     <div style={{ width: "100%" }}>
@@ -180,7 +171,10 @@ export default function Income() {
                       <InputCurrency
                         style={{ width: "100%" }}
                         readOnly={!isEdit}
-                        onChange={calculateTotal}
+                        onChange={() => {
+                          const total = Calculate(form.getFieldValue("income"));
+                          setTotalIncome(total);
+                        }}
                       />
                     </Form.Item>
                   )}
