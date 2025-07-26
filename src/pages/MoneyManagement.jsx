@@ -3,6 +3,7 @@ import { DatePicker } from "antd";
 import dayjs from "dayjs";
 import Period from "../components/Period";
 import Income from "../components/Income";
+import Expenditure from "../components/Expenditure";
 
 const MoneyManagement = () => {
   const [period, setPeriod] = useState("");
@@ -55,8 +56,12 @@ const MoneyManagement = () => {
       </header>
       <section>
         <h2 style={{ fontWeight: "bold" }}>Cashflow</h2>
-        <div id="income-statement">
+        <div
+          id="income-statement"
+          style={{ display: "flex", gap: 20, border: "1px solid blue" }}
+        >
           <Income />
+          <Expenditure />
         </div>
       </section>
     </div>
