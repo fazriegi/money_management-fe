@@ -88,6 +88,7 @@ const MoneyManagement = () => {
             label="Monthly Cashflow: "
             style={{ color: "#000" }}
             value={totalCashflow}
+            readOnly
           />
         </div>
 
@@ -102,6 +103,7 @@ const MoneyManagement = () => {
               label="Net Worth: "
               style={{ color: "#000" }}
               value={netWorth}
+              readOnly
             />
           </div>
         </div>
