@@ -3,6 +3,7 @@ import React from "react";
 
 export default function SimpleTable({
   title = "",
+  footer = null,
   style = {},
   dataSource = [],
   extraButton = [],
@@ -31,6 +32,7 @@ export default function SimpleTable({
       pagination={false}
       style={style}
       title={isUseTitle ? renderTitle : undefined}
+      footer={() => footer || undefined}
       {...props}
     >
       {children}

@@ -1,9 +1,12 @@
+import { MoneyManagementProvider } from "../context/MoneyManagementContext";
 import MoneyManagement from "./MoneyManagement";
 
 export default function Container() {
   return (
     <div id="container">
-      <MoneyManagement />
+      <MoneyManagementProvider>
+        <MoneyManagement />
+      </MoneyManagementProvider>
     </div>
   );
 }
