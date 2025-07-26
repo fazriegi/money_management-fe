@@ -30,6 +30,7 @@ const dataIncome = [
 export default function Income() {
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
+  const [totalIncome, setTotalIncome] = useState(0);
 
   const deleteRow = (key) => {
     const data = form.getFieldValue("income") || [];
@@ -83,10 +84,22 @@ export default function Income() {
 
   useEffect(() => {
     form.setFieldsValue({ income: dataIncome });
+    calculateTotal();
   }, []);
 
+  const calculateTotal = () => {
+    const data = form.getFieldValue("income") || [];
+
+    const total = data.reduce((sum, row) => {
+      const numeric = Number(String(row.value).replace(/[^\d.-]/g, "")) || 0;
+      return sum + numeric;
+    }, 0);
+
+    setTotalIncome(total);
+  };
+
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       <Form form={form} layout="inline">
         <Form.List name="income">
           {(fields, { add, remove }) => {
@@ -95,6 +108,13 @@ export default function Income() {
             return (
               <SimpleTable
                 title="Income"
+                footer={
+                  <InputCurrency
+                    label="Total Income: "
+                    value={totalIncome}
+                    readOnly
+                  />
+                }
                 dataSource={dataList.map((row, idx) => ({
                   ...row,
                   _idx: idx,
@@ -102,6 +122,7 @@ export default function Income() {
                 rowKey="key"
                 bordered
                 extraButton={extraButton}
+                style={{ width: "100%" }}
               >
                 <Column
                   title="Type"
@@ -159,6 +180,7 @@ export default function Income() {
                       <InputCurrency
                         style={{ width: "100%" }}
                         readOnly={!isEdit}
+                        onChange={calculateTotal}
                       />
                     </Form.Item>
                   )}
