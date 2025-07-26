@@ -37,6 +37,8 @@ export default function Income() {
   const deleteRow = (key) => {
     const data = form.getFieldValue("income") || [];
     const newData = data.filter((item) => item.key !== key);
+    const total = Calculate(newData);
+    setTotalIncome(total);
 
     form.setFieldsValue({ income: newData });
   };

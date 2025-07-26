@@ -29,6 +29,8 @@ export default function Expenditure() {
   const deleteRow = (key) => {
     const data = form.getFieldValue("data") || [];
     const newData = data.filter((item) => item.key !== key);
+    const total = Calculate(newData);
+    setTotal(total);
 
     form.setFieldsValue({ data: newData });
   };
