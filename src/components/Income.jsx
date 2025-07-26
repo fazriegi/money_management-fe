@@ -6,6 +6,7 @@ import Column from "antd/es/table/Column";
 import InputCurrency from "../components/InputCurrency";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Calculate } from "../helper/helper";
+import { useMoneyManagementContext } from "../context/MoneyManagementContext";
 
 const dataIncome = [
   {
@@ -29,9 +30,10 @@ const dataIncome = [
 ];
 
 export default function Income() {
+  const { totalIncome, setTotalIncome } = useMoneyManagementContext();
+
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
-  const [totalIncome, setTotalIncome] = useState(0);
   const [masterDataTemp, setMasterDataTemp] = useState({});
 
   const deleteRow = (key) => {

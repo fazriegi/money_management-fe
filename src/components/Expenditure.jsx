@@ -6,6 +6,7 @@ import Column from "antd/es/table/Column";
 import InputCurrency from "../components/InputCurrency";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Calculate } from "../helper/helper";
+import { useMoneyManagementContext } from "../context/MoneyManagementContext";
 
 const dataExpenditure = [
   {
@@ -21,16 +22,17 @@ const dataExpenditure = [
 ];
 
 export default function Expenditure() {
+  const { totalExpense, setTotalExpense } = useMoneyManagementContext();
+
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
-  const [total, setTotal] = useState(0);
   const [masterDataTemp, setMasterDataTemp] = useState({});
 
   const deleteRow = (key) => {
     const data = form.getFieldValue("data") || [];
     const newData = data.filter((item) => item.key !== key);
     const total = Calculate(newData);
-    setTotal(total);
+    setTotalExpense(total);
 
     form.setFieldsValue({ data: newData });
   };
@@ -60,7 +62,7 @@ export default function Expenditure() {
       .validateFields()
       .then((values) => {
         console.log("All rows:", values.data);
-        setMasterDataTemp({ data: values.data, total: total });
+        setMasterDataTemp({ data: values.data, total: totalExpense });
         setIsEdit((prev) => !prev);
       })
       .catch((errorInfo) => {
@@ -71,7 +73,7 @@ export default function Expenditure() {
   const onCancel = () => {
     setIsEdit((prev) => !prev);
     form.setFieldsValue({ data: masterDataTemp?.data });
-    setTotal(masterDataTemp?.total);
+    setTotalExpense(masterDataTemp?.total);
   };
 
   const extraButton = [
@@ -97,7 +99,7 @@ export default function Expenditure() {
     form.setFieldsValue({ data: dataExpenditure });
     const total = Calculate(dataExpenditure);
     setMasterDataTemp({ data: dataExpenditure, total });
-    setTotal(total);
+    setTotalExpense(total);
   }, []);
 
   return (
@@ -113,7 +115,7 @@ export default function Expenditure() {
                 footer={
                   <InputCurrency
                     label="Total Expenditure: "
-                    value={total}
+                    value={totalExpense}
                     readOnly
                   />
                 }
@@ -159,7 +161,7 @@ export default function Expenditure() {
                         readOnly={!isEdit}
                         onChange={() => {
                           const total = Calculate(form.getFieldValue("data"));
-                          setTotal(total);
+                          setTotalExpense(total);
                         }}
                       />
                     </Form.Item>
