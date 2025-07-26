@@ -1,0 +1,19 @@
+#container {
+  margin: 1em 3em;
+  min-height: 100vh;
+}
+
+#money-management header {
+  display: flex;
+  justify-content: space-around;
+}
+
+#money-management section {
+  margin-top: 2em;
+  min-height: 85vh;
+}
+
+.right-align-input input {
+  text-align: right !important;
+  text-align-last: right !important;
+}
