@@ -6,11 +6,21 @@ import Income from "../components/Income";
 import Expenditure from "../components/Expenditure";
 import InputCurrency from "../components/InputCurrency";
 import { useMoneyManagementContext } from "../context/MoneyManagementContext";
+import Asset from "../components/Asset";
+import Liability from "../components/Liability";
 
 const MoneyManagement = () => {
   const [period, setPeriod] = useState("");
-  const { totalIncome, totalExpense, totalCashflow, setTotalCashflow } =
-    useMoneyManagementContext();
+  const {
+    totalIncome,
+    totalExpense,
+    totalCashflow,
+    setTotalCashflow,
+    totalAsset,
+    totalLiability,
+    netWorth,
+    setNetWorth,
+  } = useMoneyManagementContext();
 
   const getPeriodDate = (date) => {
     // start period date every 27
@@ -43,6 +53,10 @@ const MoneyManagement = () => {
     setTotalCashflow(totalIncome - totalExpense);
   }, [totalIncome, totalExpense]);
 
+  useEffect(() => {
+    setNetWorth(totalAsset - totalLiability);
+  }, [totalAsset, totalLiability]);
+
   const changeDate = (date) => {
     const selectedDate = adjustDate(date);
     const formattedDate = selectedDate.format("MMM_YYYY").toLowerCase(); // to send to backend
@@ -59,31 +73,39 @@ const MoneyManagement = () => {
           format="MMM YYYY"
           onChange={changeDate}
           defaultValue={today}
+          allowClear={false}
         />
         <Period period={period} />
       </header>
       <section>
         <h2 style={{ fontWeight: "bold" }}>Cashflow</h2>
-        <div
-          id="income-statement"
-          style={{ display: "flex", gap: 20, border: "1px solid blue" }}
-        >
+        <div id="income-statement">
           <Income />
           <Expenditure />
         </div>
-        <div
-          style={{
-            backgroundColor: "#fff",
-            width: "30%",
-            margin: "1em auto",
-            padding: "0.5em",
-          }}
-        >
+        <div id="monthly-cashflow">
           <InputCurrency
             label="Monthly Cashflow: "
             style={{ color: "#000" }}
             value={totalCashflow}
+            readOnly
           />
+        </div>
+
+        <div id="balance-sheet" style={{ marginTop: "1.5em" }}>
+          <h2 style={{ fontWeight: "bold" }}>Balance Sheet</h2>
+          <div id="asset-liability">
+            <Asset />
+            <Liability />
+          </div>
+          <div id="net-worth">
+            <InputCurrency
+              label="Net Worth: "
+              style={{ color: "#000" }}
+              value={netWorth}
+              readOnly
+            />
+          </div>
         </div>
       </section>
     </div>
