@@ -1,4 +1,4 @@
-import { Button, Form, Input, InputNumber } from "antd";
+import { Button, Form, Input, InputNumber, message } from "antd";
 import { useState, useEffect } from "react";
 
 import SimpleTable from "../components/SimpleTable";
@@ -6,36 +6,17 @@ import Column from "antd/es/table/Column";
 import InputCurrency from "../components/InputCurrency";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Calculate } from "../helper/helper";
-import { FORMATNUMBER } from "../constant/Constant";
+import { BASE_URL, FORMATNUMBER } from "../constant/Constant";
 import { useMoneyManagementContext } from "../context/MoneyManagementContext";
-
-const data = [
-  {
-    key: "1",
-    name: "Salary",
-    value: 300000,
-    amount: 50,
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    value: "1256000",
-    amount: 50,
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    value: "120000",
-    amount: 50,
-  },
-];
+import axios from "axios";
 
 export default function Asset() {
-  const { totalAsset, setTotalAsset } = useMoneyManagementContext();
+  const { totalAsset, setTotalAsset, periodCode } = useMoneyManagementContext();
 
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
   const [masterDataTemp, setMasterDataTemp] = useState({});
+  const [fetchingData, setFetchingData] = useState(false);
 
   const deleteRow = (key) => {
     const data = form.getFieldValue("data") || [];
@@ -66,17 +47,37 @@ export default function Asset() {
     form.setFieldsValue({ data: rekeyed });
   };
 
-  const onSave = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        console.log("All rows:", values.data);
-        setMasterDataTemp({ data: values.data, total: totalAsset });
-        setIsEdit((prev) => !prev);
-      })
-      .catch((errorInfo) => {
-        form.scrollToField(errorInfo.errorFields[0].name);
+  const onSave = async () => {
+    try {
+      setFetchingData(true);
+      const values = await form.validateFields();
+
+      const data = values.data.map((obj, idx) => ({
+        ...obj,
+        order_no: idx + 1,
+      }));
+
+      await axios.put(`${BASE_URL}/assets`, {
+        period_code: periodCode,
+        data,
       });
+
+      setMasterDataTemp({ data, total: totalAsset });
+      message.success("Assets saved successfully!");
+
+      setIsEdit((prev) => !prev);
+    } catch (err) {
+      console.log("MANTAP ERR", err);
+      if (err.errorFields) {
+        form.scrollToField(err.errorFields[0].name);
+      } else if (!err?.response?.data?.is_success) {
+        message.error(err?.response?.data?.message || "Failed to save assets");
+      } else {
+        message.error("Error save assets:", err);
+      }
+    } finally {
+      setFetchingData(false);
+    }
   };
 
   const onCancel = () => {
@@ -91,6 +92,11 @@ export default function Asset() {
           <Button key="save" type="primary" onClick={onSave}>
             Save
           </Button>,
+
+          <Button key="add" icon={<PlusOutlined />} onClick={() => addRow(0)}>
+            Add
+          </Button>,
+
           <Button key="cancel" onClick={onCancel}>
             Cancel
           </Button>,
@@ -104,12 +110,36 @@ export default function Asset() {
     ),
   ].filter(Boolean);
 
+  const getData = async () => {
+    setFetchingData(true);
+
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/assets?period_code=${periodCode}`
+      );
+      const data = res.data.data.map((obj, idx) => ({
+        ...obj,
+        key: `${idx + 1}`,
+      }));
+
+      form.setFieldsValue({ data: data });
+      const total = Calculate(data, "amount");
+      setMasterDataTemp({ data: data, total });
+      setTotalAsset(total);
+    } catch (err) {
+      if (!err?.response?.data?.is_success) {
+        message.error(err?.response?.data?.message || "Failed to save assets");
+      } else {
+        message.error("Error get assets:", err);
+      }
+    } finally {
+      setFetchingData(false);
+    }
+  };
+
   useEffect(() => {
-    form.setFieldsValue({ data: data });
-    const total = Calculate(data, "amount");
-    setMasterDataTemp({ data: data, total });
-    setTotalAsset(total);
-  }, []);
+    getData();
+  }, [periodCode]);
 
   return (
     <div style={{ width: "100%" }}>
@@ -136,6 +166,7 @@ export default function Asset() {
                 bordered
                 extraButton={extraButton}
                 style={{ width: "100%" }}
+                loading={fetchingData}
               >
                 <Column
                   title="Name"
