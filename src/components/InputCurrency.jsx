@@ -24,9 +24,7 @@ const InputCurrency = ({
           formatter={FORMATNUMBER}
           style={{
             width: "100%",
-            backgroundColor: "#f9f9f9",
             cursor: "default",
-            color: "#000",
             ...inputStyle,
           }}
           className="right-align-input"

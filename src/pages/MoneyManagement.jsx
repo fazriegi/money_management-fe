@@ -86,7 +86,6 @@ const MoneyManagement = () => {
         <div id="monthly-cashflow">
           <InputCurrency
             label="Monthly Cashflow: "
-            style={{ color: "#000" }}
             value={totalCashflow}
             readOnly
           />
@@ -101,7 +100,6 @@ const MoneyManagement = () => {
           <div id="net-worth">
             <InputCurrency
               label="Net Worth: "
-              style={{ color: "#000" }}
               value={netWorth}
               readOnly
             />
