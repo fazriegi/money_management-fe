@@ -78,31 +78,33 @@ const MoneyManagement = () => {
         <Period period={period} />
       </header>
       <section>
-        <h2 style={{ fontWeight: "bold" }}>Cashflow</h2>
-        <div id="income-statement">
-          <Income />
-          <Expenditure />
-        </div>
-        <div id="monthly-cashflow">
-          <InputCurrency
-            label="Monthly Cashflow: "
-            value={totalCashflow}
-            readOnly
-          />
+        <div className="glass-dark">
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <h2 style={{ fontWeight: "bold" }}>Cashflow</h2>
+            <div id="monthly-cashflow">
+              <InputCurrency
+                label="Monthly Cashflow: "
+                value={totalCashflow}
+                readOnly
+              />
+            </div>
+          </div>
+          <div id="income-statement">
+            <Income />
+            <Expenditure />
+          </div>
         </div>
 
-        <div id="balance-sheet" style={{ marginTop: "1.5em" }}>
-          <h2 style={{ fontWeight: "bold" }}>Balance Sheet</h2>
+        <div id="balance-sheet" style={{ marginTop: "2.5em" }} className="glass-dark">
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <h2 style={{ fontWeight: "bold" }}>Balance Sheet</h2>
+            <div id="net-worth">
+              <InputCurrency label="Net Worth: " value={netWorth} readOnly />
+            </div>
+          </div>
           <div id="asset-liability">
             <Asset />
             <Liability />
-          </div>
-          <div id="net-worth">
-            <InputCurrency
-              label="Net Worth: "
-              value={netWorth}
-              readOnly
-            />
           </div>
         </div>
       </section>

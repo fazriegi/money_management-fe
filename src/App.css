@@ -22,9 +22,8 @@
 #monthly-cashflow,
 #net-worth {
   width: 30%;
-  padding: 0.5em;
   border-radius: 0.5em;
-  margin: 1em auto;
+  margin: auto 0;
 }
 
 #asset-liability {
@@ -36,6 +35,18 @@
   text-align: right !important;
   text-align-last: right !important;
 }
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1em;
+  margin: 1em auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
 
 @media (max-width: 600px) {
   body {
