@@ -11,7 +11,7 @@ import axios from "axios";
 import { BASE_URL } from "../constant/Constant";
 
 export default function Expenditure() {
-  const { totalExpense, setTotalExpense, periodCode } =
+  const { totalExpense, setTotalExpense, periodCode, xs } =
     useMoneyManagementContext();
 
   const [isEdit, setIsEdit] = useState(false);
@@ -146,7 +146,7 @@ export default function Expenditure() {
   }, [periodCode]);
 
   return (
-    <div style={{ width: "100%" }}>
+    <div style={xs ? { width: "100%" } : { width: "50%" }}>
       <Form form={form} layout="inline">
         <Form.List name="data">
           {(fields, { add, remove }) => {
@@ -159,6 +159,7 @@ export default function Expenditure() {
                   <InputCurrency
                     label="Total Expenditure: "
                     value={totalExpense}
+                    labelUp={xs}
                     readOnly
                   />
                 }

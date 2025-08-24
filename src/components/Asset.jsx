@@ -11,7 +11,7 @@ import { useMoneyManagementContext } from "../context/MoneyManagementContext";
 import axios from "axios";
 
 export default function Asset() {
-  const { totalAsset, setTotalAsset, periodCode } = useMoneyManagementContext();
+  const { totalAsset, setTotalAsset, periodCode, xs } = useMoneyManagementContext();
 
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
@@ -154,6 +154,7 @@ export default function Asset() {
                   <InputCurrency
                     label="Total Asset: "
                     value={totalAsset}
+                    labelUp={xs}
                     readOnly
                   />
                 }

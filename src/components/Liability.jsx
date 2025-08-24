@@ -11,7 +11,7 @@ import axios from "axios";
 import { BASE_URL } from "../constant/Constant";
 
 export default function Liability() {
-  const { totalLiability, setTotalLiability, periodCode } =
+  const { totalLiability, setTotalLiability, periodCode, xs } =
     useMoneyManagementContext();
 
   const [isEdit, setIsEdit] = useState(false);
@@ -159,6 +159,7 @@ export default function Liability() {
                   <InputCurrency
                     label="Total Liability: "
                     value={totalLiability}
+                    labelUp={xs}
                     readOnly
                   />
                 }

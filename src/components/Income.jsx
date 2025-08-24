@@ -11,7 +11,7 @@ import axios from "axios";
 import { BASE_URL } from "../constant/Constant";
 
 export default function Income() {
-  const { totalIncome, setTotalIncome, periodCode } =
+  const { totalIncome, setTotalIncome, periodCode, xs } =
     useMoneyManagementContext();
   const [fetchingData, setFetchingData] = useState(false);
 
@@ -141,7 +141,7 @@ export default function Income() {
   }, [periodCode]);
 
   return (
-    <div style={{ width: "100%" }}>
+    <div style={xs ? { width: "100%" } : { width: "50%" }}>
       <Form form={form} layout="inline">
         <Form.List name="data">
           {(fields, { add, remove }) => {
@@ -154,6 +154,7 @@ export default function Income() {
                   <InputCurrency
                     label="Total Income: "
                     value={totalIncome}
+                    labelUp={xs}
                     readOnly
                   />
                 }
@@ -170,7 +171,7 @@ export default function Income() {
                 <Column
                   title="Type"
                   dataIndex="type"
-                  width={50}
+                  width={70}
                   render={(_, record) => (
                     <Form.Item
                       name={[record._idx, "type"]}
@@ -198,7 +199,7 @@ export default function Income() {
                 <Column
                   title="Name"
                   dataIndex="name"
-                  width={250}
+                  width={150}
                   render={(_, record) => (
                     <Form.Item
                       name={[record._idx, "name"]}
@@ -216,7 +217,7 @@ export default function Income() {
                 <Column
                   title="Value"
                   dataIndex="value"
-                  width={250}
+                  width={150}
                   render={(_, record) => (
                     <Form.Item
                       name={[record._idx, "value"]}
@@ -234,38 +235,38 @@ export default function Income() {
                     </Form.Item>
                   )}
                 />
-                {isEdit && (
-                  <Column
-                    title="Action"
-                    dataIndex="action"
-                    width={50}
-                    render={(_, record) => (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "1em",
-                          justifyContent: "end",
-                        }}
+                <Column
+                  title="Action"
+                  dataIndex="action"
+                  width={100}
+                  render={(_, record) => (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "1em",
+                        justifyContent: "end",
+                      }}
+                    >
+                      <Button
+                        icon={<PlusOutlined />}
+                        size="small"
+                        onClick={() => addRow(record._idx + 1)}
+                        disabled={!isEdit}
                       >
-                        <Button
-                          icon={<PlusOutlined />}
-                          size="small"
-                          onClick={() => addRow(record._idx + 1)}
-                        >
-                          Add
-                        </Button>
-                        <Button
-                          danger
-                          icon={<DeleteOutlined />}
-                          size="small"
-                          onClick={() => deleteRow(record.key)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    )}
-                  />
-                )}
+                        Add
+                      </Button>
+                      <Button
+                        danger
+                        icon={<DeleteOutlined />}
+                        size="small"
+                        onClick={() => deleteRow(record.key)}
+                        disabled={!isEdit}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  )}
+                />
               </SimpleTable>
             );
           }}
