@@ -1,52 +1,21 @@
-import { Button, Form, Input, message, Select } from "antd";
+import { Form, Input, message, Select } from "antd";
 import { useState, useEffect } from "react";
-
-import SimpleTable from "../components/SimpleTable";
 import Column from "antd/es/table/Column";
 import InputCurrency from "../components/InputCurrency";
-import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Calculate } from "../helper/helper";
 import { useMoneyManagementContext } from "../context/MoneyManagementContext";
 import axios from "axios";
 import { BASE_URL } from "../constant/Constant";
+import MMFormTable from "./MMFormTable";
 
 export default function Income() {
-  const { totalIncome, setTotalIncome, periodCode } =
+  const { totalIncome, setTotalIncome, periodCode, xs } =
     useMoneyManagementContext();
-  const [fetchingData, setFetchingData] = useState(false);
 
+  const [fetchingData, setFetchingData] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
   const [masterDataTemp, setMasterDataTemp] = useState({});
-
-  const deleteRow = (key) => {
-    const data = form.getFieldValue("data") || [];
-    const newData = data.filter((item) => item.key !== key);
-    const total = Calculate(newData);
-    setTotalIncome(total);
-
-    form.setFieldsValue({ data: newData });
-  };
-
-  /**
-   * Inserts a new blank row at the given index (default: at end)
-   * @param {number} insertIndex - position to insert new row
-   */
-  const addRow = (insertIndex = form.getFieldValue("data")?.length || 0) => {
-    const data = form.getFieldValue("data") || [];
-    const newRow = { name: "", value: "0", type: null };
-
-    const newArr = [...data];
-    newArr.splice(insertIndex, 0, newRow);
-
-    // re‑assign keys based on position
-    const rekeyed = newArr.map((row, idx) => ({
-      ...row,
-      key: String(idx + 1),
-    }));
-
-    form.setFieldsValue({ data: rekeyed });
-  };
 
   const onSave = async () => {
     try {
@@ -68,7 +37,6 @@ export default function Income() {
 
       setIsEdit((prev) => !prev);
     } catch (err) {
-      console.error(err);
       if (err.errorFields) {
         form.scrollToField(err.errorFields[0].name);
       } else if (!err?.response?.data?.is_success) {
@@ -114,163 +82,104 @@ export default function Income() {
     }
   };
 
-  const extraButton = [
-    ...(isEdit
-      ? [
-          <Button key="save" type="primary" onClick={onSave}>
-            Save
-          </Button>,
-          <Button key="add" icon={<PlusOutlined />} onClick={() => addRow(0)}>
-            Add
-          </Button>,
-          <Button key="cancel" onClick={onCancel}>
-            Cancel
-          </Button>,
-        ]
-      : []),
-
-    !isEdit && (
-      <Button key="edit" onClick={() => setIsEdit((prev) => !prev)}>
-        Edit
-      </Button>
-    ),
-  ].filter(Boolean);
-
   useEffect(() => {
     getData();
   }, [periodCode]);
 
-  return (
-    <div style={{ width: "100%" }}>
-      <Form form={form} layout="inline">
-        <Form.List name="data">
-          {(fields, { add, remove }) => {
-            const dataList = form.getFieldValue("data") || [];
+  const footer = (
+    <InputCurrency
+      label="Total Income: "
+      value={totalIncome}
+      labelUp={xs}
+      readOnly
+    />
+  );
 
-            return (
-              <SimpleTable
-                title="Income"
-                footer={
-                  <InputCurrency
-                    label="Total Income: "
-                    value={totalIncome}
-                    readOnly
-                  />
-                }
-                dataSource={dataList.map((row, idx) => ({
-                  ...row,
-                  _idx: idx,
-                }))}
-                rowKey="key"
-                bordered
-                extraButton={extraButton}
-                style={{ width: "100%" }}
-                loading={fetchingData}
-              >
-                <Column
-                  title="Type"
-                  dataIndex="type"
-                  width={50}
-                  render={(_, record) => (
-                    <Form.Item
-                      name={[record._idx, "type"]}
-                      style={{ margin: 0 }}
-                      rules={[{ required: true, message: "" }]}
-                    >
-                      <Select
-                        style={{ width: "100%" }}
-                        placeholder="Select"
-                        disabled={!isEdit}
-                        options={[
-                          {
-                            label: "Passive",
-                            value: "passive",
-                          },
-                          {
-                            label: "Active",
-                            value: "active",
-                          },
-                        ]}
-                      />
-                    </Form.Item>
-                  )}
-                />
-                <Column
-                  title="Name"
-                  dataIndex="name"
-                  width={250}
-                  render={(_, record) => (
-                    <Form.Item
-                      name={[record._idx, "name"]}
-                      style={{ margin: 0 }}
-                      rules={[{ required: true, message: "" }]}
-                    >
-                      <Input
-                        style={{ width: "100%" }}
-                        placeholder="Income Name"
-                        readOnly={!isEdit}
-                      />
-                    </Form.Item>
-                  )}
-                />
-                <Column
-                  title="Value"
-                  dataIndex="value"
-                  width={250}
-                  render={(_, record) => (
-                    <Form.Item
-                      name={[record._idx, "value"]}
-                      style={{ margin: 0 }}
-                      rules={[{ required: true, message: "" }]}
-                    >
-                      <InputCurrency
-                        style={{ width: "100%" }}
-                        readOnly={!isEdit}
-                        onChange={() => {
-                          const total = Calculate(form.getFieldValue("data"));
-                          setTotalIncome(total);
-                        }}
-                      />
-                    </Form.Item>
-                  )}
-                />
-                {isEdit && (
-                  <Column
-                    title="Action"
-                    dataIndex="action"
-                    width={50}
-                    render={(_, record) => (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "1em",
-                          justifyContent: "end",
-                        }}
-                      >
-                        <Button
-                          icon={<PlusOutlined />}
-                          size="small"
-                          onClick={() => addRow(record._idx + 1)}
-                        >
-                          Add
-                        </Button>
-                        <Button
-                          danger
-                          icon={<DeleteOutlined />}
-                          size="small"
-                          onClick={() => deleteRow(record.key)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    )}
-                  />
-                )}
-              </SimpleTable>
-            );
-          }}
-        </Form.List>
-      </Form>
+  const columns = [
+    <Column
+      title="Type"
+      dataIndex="type"
+      width={70}
+      render={(_, record) => (
+        <Form.Item
+          name={[record._idx, "type"]}
+          style={{ margin: 0 }}
+          rules={[{ required: true, message: "" }]}
+        >
+          <Select
+            style={{ width: "100%" }}
+            placeholder="Select"
+            disabled={!isEdit}
+            options={[
+              {
+                label: "Passive",
+                value: "passive",
+              },
+              {
+                label: "Active",
+                value: "active",
+              },
+            ]}
+          />
+        </Form.Item>
+      )}
+    />,
+    <Column
+      title="Name"
+      dataIndex="name"
+      width={150}
+      render={(_, record) => (
+        <Form.Item
+          name={[record._idx, "name"]}
+          style={{ margin: 0 }}
+          rules={[{ required: true, message: "" }]}
+        >
+          <Input
+            style={{ width: "100%" }}
+            placeholder="Income Name"
+            readOnly={!isEdit}
+          />
+        </Form.Item>
+      )}
+    />,
+    <Column
+      title="Value"
+      dataIndex="value"
+      width={150}
+      render={(_, record) => (
+        <Form.Item
+          name={[record._idx, "value"]}
+          style={{ margin: 0 }}
+          rules={[{ required: true, message: "" }]}
+        >
+          <InputCurrency
+            style={{ width: "100%" }}
+            readOnly={!isEdit}
+            onChange={() => {
+              const total = Calculate(form.getFieldValue("data"));
+              setTotalIncome(total);
+            }}
+          />
+        </Form.Item>
+      )}
+    />,
+  ];
+
+  return (
+    <div style={xs ? { width: "100%" } : { width: "50%" }}>
+      <MMFormTable
+        title="Incomes"
+        form={form}
+        columns={columns}
+        isEdit={isEdit}
+        setIsEdit={setIsEdit}
+        disableAction={!isEdit}
+        loading={fetchingData}
+        onSave={onSave}
+        onCancel={onCancel}
+        footer={footer}
+        xs={xs}
+      />
     </div>
   );
 }

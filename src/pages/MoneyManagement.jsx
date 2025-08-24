@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DatePicker } from "antd";
+import { DatePicker, Grid } from "antd";
 import dayjs from "dayjs";
 import Period from "../components/Period";
 import Income from "../components/Income";
@@ -9,7 +9,11 @@ import { useMoneyManagementContext } from "../context/MoneyManagementContext";
 import Asset from "../components/Asset";
 import Liability from "../components/Liability";
 
+const { useBreakpoint } = Grid;
+
 const MoneyManagement = () => {
+  const { xs } = useBreakpoint();
+
   const [period, setPeriod] = useState("");
   const {
     today,
@@ -69,27 +73,49 @@ const MoneyManagement = () => {
       </header>
       <section>
         <div className="glass-dark">
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div
+            style={
+              !xs
+                ? { display: "flex", justifyContent: "space-between" }
+                : { marginBottom: "0.5em" }
+            }
+          >
             <h2 style={{ fontWeight: "bold" }}>Cashflow</h2>
             <div id="monthly-cashflow">
               <InputCurrency
                 label="Monthly Cashflow: "
                 value={totalCashflow}
+                labelUp={xs}
                 readOnly
               />
             </div>
           </div>
-          <div id="income-statement">
+          <div id="income-statement" style={{ width: "100%" }}>
             <Income />
             <Expenditure />
           </div>
         </div>
 
-        <div id="balance-sheet" style={{ marginTop: "2.5em" }} className="glass-dark">
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div
+          id="balance-sheet"
+          style={{ marginTop: "2.5em" }}
+          className="glass-dark"
+        >
+          <div
+            style={
+              !xs
+                ? { display: "flex", justifyContent: "space-between" }
+                : { marginBottom: "0.5em" }
+            }
+          >
             <h2 style={{ fontWeight: "bold" }}>Balance Sheet</h2>
             <div id="net-worth">
-              <InputCurrency label="Net Worth: " value={netWorth} readOnly />
+              <InputCurrency
+                label="Net Worth: "
+                value={netWorth}
+                labelUp={xs}
+                readOnly
+              />
             </div>
           </div>
           <div id="asset-liability">

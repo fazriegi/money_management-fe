@@ -5,14 +5,19 @@ const InputCurrency = ({
   label = "",
   defaultValue = 0,
   inputStyle = {},
+  labelUp = false,
   ...props
 }) => {
   return (
     <div
       style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
+        ...(!labelUp
+          ? {
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }
+          : {}),
         ...props?.style,
       }}
     >

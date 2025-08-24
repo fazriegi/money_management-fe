@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import dayjs from "dayjs";
+import { Grid } from "antd";
 
 export const MoneyManagementContext = createContext({});
 
@@ -11,6 +12,9 @@ export const MoneyManagementProvider = ({ children }) => {
   const [totalAsset, setTotalAsset] = useState(0);
   const [totalLiability, setTotalLiability] = useState(0);
   const [netWorth, setNetWorth] = useState(0);
+
+  const { useBreakpoint } = Grid;
+  const { xs } = useBreakpoint();
 
   const adjustDate = (selectedDate) => {
     const periodStart = selectedDate.subtract(1, "month").date(27);
@@ -47,6 +51,7 @@ export const MoneyManagementProvider = ({ children }) => {
     setTotalLiability,
     netWorth,
     setNetWorth,
+    xs,
   };
 
   return (
