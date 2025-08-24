@@ -178,6 +178,7 @@ export default function Income() {
         onSave={onSave}
         onCancel={onCancel}
         footer={footer}
+        xs={xs}
       />
     </div>
   );

@@ -156,6 +156,7 @@ export default function Expenditure() {
         onSave={onSave}
         onCancel={onCancel}
         footer={footer}
+         xs={xs}
       />
     </div>
   );

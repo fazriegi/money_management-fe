@@ -172,6 +172,7 @@ export default function Asset() {
         onSave={onSave}
         onCancel={onCancel}
         footer={footer}
+         xs={xs}
       />
     </div>
   );

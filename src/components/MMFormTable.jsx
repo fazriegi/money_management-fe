@@ -1,14 +1,8 @@
-import { Button, Form, Input, message, Select } from "antd";
-import { useState, useEffect } from "react";
-
+import { Button, Form } from "antd";
 import SimpleTable from "./SimpleTable";
 import Column from "antd/es/table/Column";
-import InputCurrency from "./InputCurrency";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import { Calculate } from "../helper/helper";
-import { useMoneyManagementContext } from "../context/MoneyManagementContext";
-import axios from "axios";
-import { BASE_URL } from "../constant/Constant";
+import HamburgerModal from "./Hamburger";
 
 export default function MMFormTable({
   title,
@@ -20,28 +14,41 @@ export default function MMFormTable({
   onCancel,
   isEdit,
   setIsEdit,
+  xs,
   ...props
 }) {
-  const extraButton = [
-    ...(isEdit
-      ? [
+  const onEditButton = (
+    <div
+      style={{
+        display: "flex",
+        gap: 10,
+        flexDirection: xs ? "column" : "row",
+        width: xs ? "100%" : "auto",
+      }}
+    >
+      {isEdit ? (
+        <>
           <Button key="save" type="primary" onClick={onSave}>
             Save
-          </Button>,
+          </Button>
+
           <Button key="add" icon={<PlusOutlined />} onClick={() => addRow(0)}>
             Add
-          </Button>,
+          </Button>
           <Button key="cancel" onClick={onCancel}>
             Cancel
-          </Button>,
-        ]
-      : []),
+          </Button>
+        </>
+      ) : (
+        <Button key="edit" onClick={() => setIsEdit((prev) => !prev)}>
+          Edit
+        </Button>
+      )}
+    </div>
+  );
 
-    !isEdit && (
-      <Button key="edit" onClick={() => setIsEdit((prev) => !prev)}>
-        Edit
-      </Button>
-    ),
+  const extraButton = [
+    xs ? <HamburgerModal component={onEditButton} /> : onEditButton,
   ].filter(Boolean);
 
   const deleteRow = (key) => {
@@ -100,8 +107,10 @@ export default function MMFormTable({
                   <div
                     style={{
                       display: "flex",
-                      gap: "1em",
+                      gap: "0.5em",
                       justifyContent: "end",
+                      flexDirection: xs ? "column" : "row",
+                      width: xs ? "100%" : "auto",
                     }}
                   >
                     <Button
