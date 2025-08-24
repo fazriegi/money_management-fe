@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import dayjs from "dayjs";
 
 export const MoneyManagementContext = createContext({});
 
@@ -11,7 +12,29 @@ export const MoneyManagementProvider = ({ children }) => {
   const [totalLiability, setTotalLiability] = useState(0);
   const [netWorth, setNetWorth] = useState(0);
 
+  const adjustDate = (selectedDate) => {
+    const periodStart = selectedDate.subtract(1, "month").date(27);
+    const periodEnd = selectedDate.date(26);
+
+    if (
+      (selectedDate.isSame(periodStart) || selectedDate.isAfter(periodStart)) &&
+      (selectedDate.isSame(periodEnd) || selectedDate.isBefore(periodEnd))
+    ) {
+      return periodStart;
+    }
+    return selectedDate;
+  };
+
+  const today = adjustDate(dayjs());
+  const initPeriod = today.format("MMM_YYYY").toLowerCase();
+
+  const [periodCode, setPeriodCode] = useState(initPeriod);
+
   const value = {
+    today,
+    adjustDate,
+    periodCode,
+    setPeriodCode,
     totalIncome,
     totalExpense,
     setTotalIncome,

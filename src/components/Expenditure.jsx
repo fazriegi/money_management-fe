@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select } from "antd";
+import { Button, Form, Input, message } from "antd";
 import { useState, useEffect } from "react";
 
 import SimpleTable from "../components/SimpleTable";
@@ -7,24 +7,15 @@ import InputCurrency from "../components/InputCurrency";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Calculate } from "../helper/helper";
 import { useMoneyManagementContext } from "../context/MoneyManagementContext";
-
-const dataExpenditure = [
-  {
-    key: "1",
-    name: "Salary",
-    value: "300000",
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    value: 1256000,
-  },
-];
+import axios from "axios";
+import { BASE_URL } from "../constant/Constant";
 
 export default function Expenditure() {
-  const { totalExpense, setTotalExpense } = useMoneyManagementContext();
+  const { totalExpense, setTotalExpense, periodCode } =
+    useMoneyManagementContext();
 
   const [isEdit, setIsEdit] = useState(false);
+  const [fetchingData, setFetchingData] = useState(false);
   const [form] = Form.useForm();
   const [masterDataTemp, setMasterDataTemp] = useState({});
 
@@ -57,17 +48,39 @@ export default function Expenditure() {
     form.setFieldsValue({ data: rekeyed });
   };
 
-  const onSave = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        console.log("All rows:", values.data);
-        setMasterDataTemp({ data: values.data, total: totalExpense });
-        setIsEdit((prev) => !prev);
-      })
-      .catch((errorInfo) => {
-        form.scrollToField(errorInfo.errorFields[0].name);
+  const onSave = async () => {
+    try {
+      setFetchingData(true);
+      const values = await form.validateFields();
+
+      const data = values.data.map((obj, idx) => ({
+        ...obj,
+        order_no: idx + 1,
+      }));
+
+      await axios.put(`${BASE_URL}/expenses`, {
+        period_code: periodCode,
+        data,
       });
+
+      setMasterDataTemp({ data: data, total: totalExpense });
+      message.success("Expenses saved successfully!");
+
+      setIsEdit((prev) => !prev);
+    } catch (err) {
+      console.error(err);
+      if (err.errorFields) {
+        form.scrollToField(err.errorFields[0].name);
+      } else if (!err?.response?.data?.is_success) {
+        message.error(
+          err?.response?.data?.message || "Failed to save expenses"
+        );
+      } else {
+        message.error("Error save expenses:", err);
+      }
+    } finally {
+      setFetchingData(false);
+    }
   };
 
   const onCancel = () => {
@@ -82,6 +95,9 @@ export default function Expenditure() {
           <Button key="save" type="primary" onClick={onSave}>
             Save
           </Button>,
+          <Button key="add" icon={<PlusOutlined />} onClick={() => addRow(0)}>
+            Add
+          </Button>,
           <Button key="cancel" onClick={onCancel}>
             Cancel
           </Button>,
@@ -95,12 +111,39 @@ export default function Expenditure() {
     ),
   ].filter(Boolean);
 
+  const getData = async () => {
+    setFetchingData(true);
+
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/expenses?period_code=${periodCode}`
+      );
+      const data = res.data.data.map((obj, idx) => ({
+        ...obj,
+        key: `${idx + 1}`,
+      }));
+
+      form.setFieldsValue({ data: data });
+      const total = Calculate(data);
+      setMasterDataTemp({ data: data, total });
+      setTotalExpense(total);
+    } catch (err) {
+      console.error(err);
+      if (!err?.response?.data?.is_success) {
+        message.error(
+          err?.response?.data?.message || "Failed to save expenses"
+        );
+      } else {
+        message.error("Error get expenses:", err);
+      }
+    } finally {
+      setFetchingData(false);
+    }
+  };
+
   useEffect(() => {
-    form.setFieldsValue({ data: dataExpenditure });
-    const total = Calculate(dataExpenditure);
-    setMasterDataTemp({ data: dataExpenditure, total });
-    setTotalExpense(total);
-  }, []);
+    getData();
+  }, [periodCode]);
 
   return (
     <div style={{ width: "100%" }}>
@@ -127,6 +170,7 @@ export default function Expenditure() {
                 bordered
                 extraButton={extraButton}
                 style={{ width: "100%" }}
+                loading={fetchingData}
               >
                 <Column
                   title="Name"

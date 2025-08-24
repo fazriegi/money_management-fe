@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select } from "antd";
+import { Button, Form, Input, message, Select } from "antd";
 import { useState, useEffect } from "react";
 
 import SimpleTable from "../components/SimpleTable";
@@ -7,50 +7,33 @@ import InputCurrency from "../components/InputCurrency";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Calculate } from "../helper/helper";
 import { useMoneyManagementContext } from "../context/MoneyManagementContext";
-
-const dataIncome = [
-  {
-    key: "1",
-    name: "Salary",
-    value: 300000,
-    type: "passive",
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    value: "1256000",
-    type: "active",
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    value: "120000",
-    type: "passive",
-  },
-];
+import axios from "axios";
+import { BASE_URL } from "../constant/Constant";
 
 export default function Income() {
-  const { totalIncome, setTotalIncome } = useMoneyManagementContext();
+  const { totalIncome, setTotalIncome, periodCode } =
+    useMoneyManagementContext();
+  const [fetchingData, setFetchingData] = useState(false);
 
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
   const [masterDataTemp, setMasterDataTemp] = useState({});
 
   const deleteRow = (key) => {
-    const data = form.getFieldValue("income") || [];
+    const data = form.getFieldValue("data") || [];
     const newData = data.filter((item) => item.key !== key);
     const total = Calculate(newData);
     setTotalIncome(total);
 
-    form.setFieldsValue({ income: newData });
+    form.setFieldsValue({ data: newData });
   };
 
   /**
    * Inserts a new blank row at the given index (default: at end)
    * @param {number} insertIndex - position to insert new row
    */
-  const addRow = (insertIndex = form.getFieldValue("income")?.length || 0) => {
-    const data = form.getFieldValue("income") || [];
+  const addRow = (insertIndex = form.getFieldValue("data")?.length || 0) => {
+    const data = form.getFieldValue("data") || [];
     const newRow = { name: "", value: "0", type: null };
 
     const newArr = [...data];
@@ -62,26 +45,73 @@ export default function Income() {
       key: String(idx + 1),
     }));
 
-    form.setFieldsValue({ income: rekeyed });
+    form.setFieldsValue({ data: rekeyed });
   };
 
-  const onSave = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        console.log("All rows:", values.income);
-        setMasterDataTemp({ data: values.income, total: totalIncome });
-        setIsEdit((prev) => !prev);
-      })
-      .catch((errorInfo) => {
-        form.scrollToField(errorInfo.errorFields[0].name);
+  const onSave = async () => {
+    try {
+      setFetchingData(true);
+      const values = await form.validateFields();
+
+      const data = values.data.map((obj, idx) => ({
+        ...obj,
+        order_no: idx + 1,
+      }));
+
+      await axios.put(`${BASE_URL}/incomes`, {
+        period_code: periodCode,
+        data,
       });
+
+      setMasterDataTemp({ data, total: totalIncome });
+      message.success("Incomes saved successfully!");
+
+      setIsEdit((prev) => !prev);
+    } catch (err) {
+      console.error(err);
+      if (err.errorFields) {
+        form.scrollToField(err.errorFields[0].name);
+      } else if (!err?.response?.data?.is_success) {
+        message.error(err?.response?.data?.message || "Failed to save incomes");
+      } else {
+        message.error("Error save incomes:", err);
+      }
+    } finally {
+      setFetchingData(false);
+    }
   };
 
   const onCancel = () => {
     setIsEdit((prev) => !prev);
-    form.setFieldsValue({ income: masterDataTemp?.data });
+    form.setFieldsValue({ data: masterDataTemp?.data });
     setTotalIncome(masterDataTemp?.total);
+  };
+
+  const getData = async () => {
+    setFetchingData(true);
+
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/incomes?period_code=${periodCode}`
+      );
+      const data = res.data.data.map((obj, idx) => ({
+        ...obj,
+        key: `${idx + 1}`,
+      }));
+
+      form.setFieldsValue({ data: data });
+      const total = Calculate(data);
+      setMasterDataTemp({ data: data, total });
+      setTotalIncome(total);
+    } catch (err) {
+      if (!err?.response?.data?.is_success) {
+        message.error(err?.response?.data?.message || "Failed to save incomes");
+      } else {
+        message.error("Error get incomes:", err);
+      }
+    } finally {
+      setFetchingData(false);
+    }
   };
 
   const extraButton = [
@@ -89,6 +119,9 @@ export default function Income() {
       ? [
           <Button key="save" type="primary" onClick={onSave}>
             Save
+          </Button>,
+          <Button key="add" icon={<PlusOutlined />} onClick={() => addRow(0)}>
+            Add
           </Button>,
           <Button key="cancel" onClick={onCancel}>
             Cancel
@@ -104,18 +137,15 @@ export default function Income() {
   ].filter(Boolean);
 
   useEffect(() => {
-    form.setFieldsValue({ income: dataIncome });
-    const total = Calculate(dataIncome);
-    setMasterDataTemp({ data: dataIncome, total });
-    setTotalIncome(total);
-  }, []);
+    getData();
+  }, [periodCode]);
 
   return (
     <div style={{ width: "100%" }}>
       <Form form={form} layout="inline">
-        <Form.List name="income">
+        <Form.List name="data">
           {(fields, { add, remove }) => {
-            const dataList = form.getFieldValue("income") || [];
+            const dataList = form.getFieldValue("data") || [];
 
             return (
               <SimpleTable
@@ -135,6 +165,7 @@ export default function Income() {
                 bordered
                 extraButton={extraButton}
                 style={{ width: "100%" }}
+                loading={fetchingData}
               >
                 <Column
                   title="Type"
@@ -196,7 +227,7 @@ export default function Income() {
                         style={{ width: "100%" }}
                         readOnly={!isEdit}
                         onChange={() => {
-                          const total = Calculate(form.getFieldValue("income"));
+                          const total = Calculate(form.getFieldValue("data"));
                           setTotalIncome(total);
                         }}
                       />

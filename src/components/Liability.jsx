@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select } from "antd";
+import { Button, Form, Input, message, Select } from "antd";
 import { useState, useEffect } from "react";
 
 import SimpleTable from "../components/SimpleTable";
@@ -7,26 +7,17 @@ import InputCurrency from "../components/InputCurrency";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Calculate } from "../helper/helper";
 import { useMoneyManagementContext } from "../context/MoneyManagementContext";
-
-const data = [
-  {
-    key: "1",
-    name: "Salary",
-    value: "300000",
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    value: 1256000,
-  },
-];
+import axios from "axios";
+import { BASE_URL } from "../constant/Constant";
 
 export default function Liability() {
-  const { totalLiability, setTotalLiability } = useMoneyManagementContext();
+  const { totalLiability, setTotalLiability, periodCode } =
+    useMoneyManagementContext();
 
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
   const [masterDataTemp, setMasterDataTemp] = useState({});
+  const [fetchingData, setFetchingData] = useState(false);
 
   const deleteRow = (key) => {
     const data = form.getFieldValue("data") || [];
@@ -57,17 +48,39 @@ export default function Liability() {
     form.setFieldsValue({ data: rekeyed });
   };
 
-  const onSave = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        console.log("All rows:", values.data);
-        setMasterDataTemp({ data: values.data, total: totalLiability });
-        setIsEdit((prev) => !prev);
-      })
-      .catch((errorInfo) => {
-        form.scrollToField(errorInfo.errorFields[0].name);
+  const onSave = async () => {
+    try {
+      setFetchingData(true);
+      const values = await form.validateFields();
+
+      const data = values.data.map((obj, idx) => ({
+        ...obj,
+        order_no: idx + 1,
+      }));
+
+      await axios.put(`${BASE_URL}/liabilities`, {
+        period_code: periodCode,
+        data,
       });
+
+      setMasterDataTemp({ data: data, total: totalLiability });
+      message.success("Liabilities saved successfully!");
+
+      setIsEdit((prev) => !prev);
+    } catch (err) {
+      console.error(err);
+      if (err.errorFields) {
+        form.scrollToField(err.errorFields[0].name);
+      } else if (!err?.response?.data?.is_success) {
+        message.error(
+          err?.response?.data?.message || "Failed to save liabilities"
+        );
+      } else {
+        message.error("Error save liabilities:", err);
+      }
+    } finally {
+      setFetchingData(false);
+    }
   };
 
   const onCancel = () => {
@@ -82,6 +95,9 @@ export default function Liability() {
           <Button key="save" type="primary" onClick={onSave}>
             Save
           </Button>,
+          <Button key="add" icon={<PlusOutlined />} onClick={() => addRow(0)}>
+            Add
+          </Button>,
           <Button key="cancel" onClick={onCancel}>
             Cancel
           </Button>,
@@ -95,12 +111,39 @@ export default function Liability() {
     ),
   ].filter(Boolean);
 
+  const getData = async () => {
+    setFetchingData(true);
+
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/liabilities?period_code=${periodCode}`
+      );
+      const data = res.data.data.map((obj, idx) => ({
+        ...obj,
+        key: `${idx + 1}`,
+      }));
+
+      form.setFieldsValue({ data: data });
+      const total = Calculate(data);
+      setMasterDataTemp({ data: data, total });
+      setTotalLiability(total);
+    } catch (err) {
+      console.error(err);
+      if (!err?.response?.data?.is_success) {
+        message.error(
+          err?.response?.data?.message || "Failed to save liabilities"
+        );
+      } else {
+        message.error("Error get liabilities:", err);
+      }
+    } finally {
+      setFetchingData(false);
+    }
+  };
+
   useEffect(() => {
-    form.setFieldsValue({ data: data });
-    const total = Calculate(data);
-    setMasterDataTemp({ data: data, total });
-    setTotalLiability(total);
-  }, []);
+    getData();
+  }, [periodCode]);
 
   return (
     <div style={{ width: "100%" }}>
@@ -127,6 +170,7 @@ export default function Liability() {
                 bordered
                 extraButton={extraButton}
                 style={{ width: "100%" }}
+                loading={fetchingData}
               >
                 <Column
                   title="Name"
