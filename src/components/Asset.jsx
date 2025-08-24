@@ -67,7 +67,6 @@ export default function Asset() {
 
       setIsEdit((prev) => !prev);
     } catch (err) {
-      console.log("MANTAP ERR", err);
       if (err.errorFields) {
         form.scrollToField(err.errorFields[0].name);
       } else if (!err?.response?.data?.is_success) {
