@@ -188,7 +188,7 @@ export default function Asset() {
                 <Column
                   title="Amount"
                   dataIndex="amount"
-                  width={20}
+                  width={200}
                   render={(_, record) => (
                     <Form.Item
                       name={[record._idx, "amount"]}
@@ -213,7 +213,7 @@ export default function Asset() {
                 <Column
                   title="Value"
                   dataIndex="value"
-                  width={250}
+                  width={200}
                   render={(_, record) => (
                     <Form.Item
                       name={[record._idx, "value"]}
