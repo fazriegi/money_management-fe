@@ -75,7 +75,9 @@ const MoneyManagement = () => {
         <div className="glass-dark">
           <div
             style={
-              !xs ? { display: "flex", justifyContent: "space-between" } : {}
+              !xs
+                ? { display: "flex", justifyContent: "space-between" }
+                : { marginBottom: "0.5em" }
             }
           >
             <h2 style={{ fontWeight: "bold" }}>Cashflow</h2>
@@ -99,7 +101,13 @@ const MoneyManagement = () => {
           style={{ marginTop: "2.5em" }}
           className="glass-dark"
         >
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div
+            style={
+              !xs
+                ? { display: "flex", justifyContent: "space-between" }
+                : { marginBottom: "0.5em" }
+            }
+          >
             <h2 style={{ fontWeight: "bold" }}>Balance Sheet</h2>
             <div id="net-worth">
               <InputCurrency
