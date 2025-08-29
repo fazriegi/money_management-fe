@@ -4,9 +4,8 @@ import Column from "antd/es/table/Column";
 import InputCurrency from "../components/InputCurrency";
 import { Calculate } from "../helper/helper";
 import { useMoneyManagementContext } from "../context/MoneyManagementContext";
-import axios from "axios";
-import { BASE_URL } from "../constant/Constant";
 import MMFormTable from "./MMFormTable";
+import api from "../helper/api";
 
 export default function Income() {
   const { totalIncome, setTotalIncome, periodCode, xs } =
@@ -27,7 +26,7 @@ export default function Income() {
         order_no: idx + 1,
       }));
 
-      await axios.put(`${BASE_URL}/incomes`, {
+      await api.put(`/incomes`, {
         period_code: periodCode,
         data,
       });
@@ -59,8 +58,8 @@ export default function Income() {
     setFetchingData(true);
 
     try {
-      const res = await axios.get(
-        `${BASE_URL}/incomes?period_code=${periodCode}`
+      const res = await api.get(
+        `/incomes?period_code=${periodCode}`
       );
       const data = res.data.data.map((obj, idx) => ({
         ...obj,
@@ -73,7 +72,7 @@ export default function Income() {
       setTotalIncome(total);
     } catch (err) {
       if (!err?.response?.data?.is_success) {
-        message.error(err?.response?.data?.message || "Failed to save incomes");
+        message.error(err?.response?.data?.message || "Failed to get incomes");
       } else {
         message.error("Error get incomes:", err);
       }

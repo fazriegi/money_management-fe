@@ -4,9 +4,8 @@ import Column from "antd/es/table/Column";
 import InputCurrency from "../components/InputCurrency";
 import { Calculate } from "../helper/helper";
 import { useMoneyManagementContext } from "../context/MoneyManagementContext";
-import axios from "axios";
-import { BASE_URL } from "../constant/Constant";
 import MMFormTable from "./MMFormTable";
+import api from "../helper/api";
 
 export default function Liability() {
   const { totalLiability, setTotalLiability, periodCode, xs } =
@@ -27,7 +26,7 @@ export default function Liability() {
         order_no: idx + 1,
       }));
 
-      await axios.put(`${BASE_URL}/liabilities`, {
+      await api.put(`/liabilities`, {
         period_code: periodCode,
         data,
       });
@@ -62,8 +61,8 @@ export default function Liability() {
     setFetchingData(true);
 
     try {
-      const res = await axios.get(
-        `${BASE_URL}/liabilities?period_code=${periodCode}`
+      const res = await api.get(
+        `/liabilities?period_code=${periodCode}`
       );
       const data = res.data.data.map((obj, idx) => ({
         ...obj,
@@ -78,7 +77,7 @@ export default function Liability() {
       console.error(err);
       if (!err?.response?.data?.is_success) {
         message.error(
-          err?.response?.data?.message || "Failed to save liabilities"
+          err?.response?.data?.message || "Failed to get liabilities"
         );
       } else {
         message.error("Error get liabilities:", err);
