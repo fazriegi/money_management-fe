@@ -1,34 +1,79 @@
 import { UserOutlined } from "@ant-design/icons";
-import { Button, Input, message, Typography } from "antd";
+import { Button, Form, Input, message, Typography } from "antd";
+import Password from "antd/es/input/Password";
+import axios from "axios";
+import { BASE_URL } from "../constant/Constant";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const handleLogin = () => {
-    message.error("Implement me!");
+  const [isSubmit, setIsSubmit] = useState(false);
+  const navigate = useNavigate();
+
+  const onFinish = async (formData) => {
+    setIsSubmit(true);
+    try {
+      const response = await axios.post(`${BASE_URL}/auth/login`, {
+        username: formData.username,
+        password: formData.password,
+      });
+
+      const respBody = response?.data;
+
+      if (respBody?.is_success) {
+        localStorage.setItem("USER", JSON.stringify(respBody?.data));
+        navigate("/money-management");
+      }
+    } catch (err) {
+      message.error(
+        `${err?.response?.data?.status}: ${err?.response?.data?.message}`
+      );
+    } finally {
+      setIsSubmit(false);
+    }
   };
 
   return (
     <div id="login-container">
       <div className="glass-container">
-        <div id="login-form">
+        <Form
+          name="basic"
+          id="login-form"
+          onFinish={onFinish}
+          autoComplete="off"
+        >
           <Typography.Title style={{ marginBottom: "2em" }}>
             Sign In
           </Typography.Title>
-          <Input
-            placeholder="Username"
-            prefix={<UserOutlined />}
-            size="large"
-            style={{ marginBottom: "1em" }}
-          />
-          <Input.Password placeholder="Password" size="large" />
-          <Button
-            type="primary"
-            style={{ marginTop: "2em", width: "100%" }}
-            size="large"
-            onClick={handleLogin}
+          <Form.Item
+            name="username"
+            rules={[{ required: true, message: "Please input your username!" }]}
           >
-            Sign In
-          </Button>
-        </div>
+            <Input
+              placeholder="Username"
+              prefix={<UserOutlined />}
+              size="large"
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Input.Password placeholder="Password" size="large" />
+          </Form.Item>
+
+          <Form.Item label={null}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ width: "100%" }}
+              loading={isSubmit}
+            >
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     </div>
   );
