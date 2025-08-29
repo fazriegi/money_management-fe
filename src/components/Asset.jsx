@@ -5,8 +5,8 @@ import InputCurrency from "../components/InputCurrency";
 import { Calculate } from "../helper/helper";
 import { BASE_URL, FORMATNUMBER } from "../constant/Constant";
 import { useMoneyManagementContext } from "../context/MoneyManagementContext";
-import axios from "axios";
 import MMFormTable from "./MMFormTable";
+import api from "../helper/api";
 
 export default function Asset() {
   const { totalAsset, setTotalAsset, periodCode, xs } =
@@ -27,7 +27,7 @@ export default function Asset() {
         order_no: idx + 1,
       }));
 
-      await axios.put(`${BASE_URL}/assets`, {
+      await api.put(`/assets`, {
         period_code: periodCode,
         data,
       });
@@ -59,8 +59,8 @@ export default function Asset() {
     setFetchingData(true);
 
     try {
-      const res = await axios.get(
-        `${BASE_URL}/assets?period_code=${periodCode}`
+      const res = await api.get(
+        `/assets?period_code=${periodCode}`
       );
       const data = res.data.data.map((obj, idx) => ({
         ...obj,
@@ -73,7 +73,7 @@ export default function Asset() {
       setTotalAsset(total);
     } catch (err) {
       if (!err?.response?.data?.is_success) {
-        message.error(err?.response?.data?.message || "Failed to save assets");
+        message.error(err?.response?.data?.message || "Failed to get assets");
       } else {
         message.error("Error get assets:", err);
       }
