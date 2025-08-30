@@ -12,6 +12,8 @@ export const MoneyManagementProvider = ({ children }) => {
   const [totalAsset, setTotalAsset] = useState(0);
   const [totalLiability, setTotalLiability] = useState(0);
   const [netWorth, setNetWorth] = useState(0);
+  const [liabilities, setLiabilities] = useState([]);
+  const [refetchLiability, setRefetchLiability] = useState(0);
 
   const { useBreakpoint } = Grid;
   const { xs } = useBreakpoint();
@@ -52,6 +54,10 @@ export const MoneyManagementProvider = ({ children }) => {
     netWorth,
     setNetWorth,
     xs,
+    liabilities,
+    setLiabilities,
+    refetchLiability,
+    setRefetchLiability,
   };
 
   return (

@@ -8,8 +8,14 @@ import MMFormTable from "./MMFormTable";
 import api from "../helper/api";
 
 export default function Liability() {
-  const { totalLiability, setTotalLiability, periodCode, xs } =
-    useMoneyManagementContext();
+  const {
+    totalLiability,
+    setTotalLiability,
+    periodCode,
+    xs,
+    setLiabilities,
+    refetchLiability,
+  } = useMoneyManagementContext();
 
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
@@ -61,13 +67,13 @@ export default function Liability() {
     setFetchingData(true);
 
     try {
-      const res = await api.get(
-        `/liabilities?period_code=${periodCode}`
-      );
+      const res = await api.get(`/liabilities?period_code=${periodCode}`);
       const data = res.data.data.map((obj, idx) => ({
         ...obj,
         key: `${idx + 1}`,
       }));
+
+      setLiabilities(data);
 
       form.setFieldsValue({ data: data });
       const total = Calculate(data);
@@ -89,7 +95,7 @@ export default function Liability() {
 
   useEffect(() => {
     getData();
-  }, [periodCode]);
+  }, [periodCode, refetchLiability]);
 
   const columns = [
     <Column
@@ -155,7 +161,7 @@ export default function Liability() {
         onSave={onSave}
         onCancel={onCancel}
         footer={footer}
-         xs={xs}
+        xs={xs}
       />
     </div>
   );
