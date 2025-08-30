@@ -64,7 +64,17 @@ export default function MMFormTable({
    */
   const addRow = (insertIndex = form.getFieldValue("data")?.length || 0) => {
     const data = form.getFieldValue("data") || [];
-    const newRow = { name: "", value: "0", type: null };
+
+    const newRow = {}
+    if (data.length > 0) {
+      const firstRow = data[0];
+
+      Object.keys(firstRow).forEach(key => {
+        if (key !== '_idx') {
+          newRow[key] = null;
+        }
+      });
+    }
 
     const newArr = [...data];
     newArr.splice(insertIndex, 0, newRow);
