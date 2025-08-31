@@ -8,8 +8,14 @@ import MMFormTable from "./MMFormTable";
 import api from "../helper/api";
 
 export default function Liability() {
-  const { totalLiability, setTotalLiability, periodCode, xs } =
-    useMoneyManagementContext();
+  const {
+    totalLiability,
+    setTotalLiability,
+    periodCode,
+    xs,
+    setLiabilities,
+    refetchLiability,
+  } = useMoneyManagementContext();
 
   const [isEdit, setIsEdit] = useState(false);
   const [form] = Form.useForm();
@@ -33,6 +39,7 @@ export default function Liability() {
 
       setMasterDataTemp({ data: data, total: totalLiability });
       message.success("Liabilities saved successfully!");
+      getData()
 
       setIsEdit((prev) => !prev);
     } catch (err) {
@@ -57,17 +64,36 @@ export default function Liability() {
     setTotalLiability(masterDataTemp?.total);
   };
 
+  const deleteValidation = async (id) => {
+    try {
+      const res = await api.get(`/liabilities/validate-delete?id=${id}`);
+      
+      return res?.data?.data?.is_safe;
+    } catch (err) {
+      console.error(err);
+      if (!err?.response?.data?.is_success) {
+        message.error(
+          err?.response?.data?.message || "Failed to validate delete liability"
+        );
+      } else {
+        message.error("Error validate delete liability:", err);
+      }
+
+      return false
+    }
+  }
+
   const getData = async () => {
     setFetchingData(true);
 
     try {
-      const res = await api.get(
-        `/liabilities?period_code=${periodCode}`
-      );
+      const res = await api.get(`/liabilities?period_code=${periodCode}`);
       const data = res.data.data.map((obj, idx) => ({
         ...obj,
         key: `${idx + 1}`,
       }));
+
+      setLiabilities(data);
 
       form.setFieldsValue({ data: data });
       const total = Calculate(data);
@@ -89,34 +115,60 @@ export default function Liability() {
 
   useEffect(() => {
     getData();
-  }, [periodCode]);
-
+  }, [periodCode, refetchLiability]);
+  
   const columns = [
     <Column
       title="Name"
       dataIndex="name"
-      width={185}
+      width={150}
       render={(_, record) => (
-        <Form.Item
-          name={[record._idx, "name"]}
-          style={{ margin: 0 }}
-          rules={[{ required: true, message: "" }]}
-        >
-          <Input
-            style={{ width: "100%" }}
-            placeholder="Liability Name"
-            readOnly={!isEdit}
-          />
-        </Form.Item>
+        <div style={{ display: "flex", width: "100%" }}>
+          <Form.Item name={[record._idx, "id"]} hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name={[record._idx, "name"]}
+            style={{ margin: 0, flex: 1 }}
+            rules={[{ required: true, message: "" }]}
+          >
+            <Input
+              style={{ width: "100%" }}
+              placeholder="Liability Name"
+              readOnly={!isEdit}
+            />
+          </Form.Item>
+        </div>
       )}
     />,
     <Column
       title="Value"
       dataIndex="value"
-      width={185}
+      width={110}
       render={(_, record) => (
         <Form.Item
           name={[record._idx, "value"]}
+          style={{ margin: 0 }}
+          rules={[{ required: true, message: "" }]}
+        >
+          <InputCurrency
+            style={{ width: "100%" }}
+            readOnly={!isEdit}
+            onChange={() => {
+              const total = Calculate(form.getFieldValue("data"));
+              setTotalLiability(total);
+            }}
+          />
+        </Form.Item>
+      )}
+    />,
+    <Column
+      title="Installment"
+      dataIndex="installment"
+      width={110}
+      render={(_, record) => (
+        <Form.Item
+          name={[record._idx, "installment"]}
           style={{ margin: 0 }}
           rules={[{ required: true, message: "" }]}
         >
@@ -155,7 +207,8 @@ export default function Liability() {
         onSave={onSave}
         onCancel={onCancel}
         footer={footer}
-         xs={xs}
+        xs={xs}
+        deleteValidation={deleteValidation}
       />
     </div>
   );

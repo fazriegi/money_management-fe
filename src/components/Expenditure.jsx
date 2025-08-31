@@ -1,4 +1,4 @@
-import { Form, Input, message } from "antd";
+import { Form, Input, message, Select } from "antd";
 import { useState, useEffect } from "react";
 import Column from "antd/es/table/Column";
 import InputCurrency from "../components/InputCurrency";
@@ -8,8 +8,14 @@ import MMFormTable from "./MMFormTable";
 import api from "../helper/api";
 
 export default function Expenditure() {
-  const { totalExpense, setTotalExpense, periodCode, xs } =
-    useMoneyManagementContext();
+  const {
+    totalExpense,
+    setTotalExpense,
+    periodCode,
+    xs,
+    liabilities,
+    setRefetchLiability,
+  } = useMoneyManagementContext();
 
   const [isEdit, setIsEdit] = useState(false);
   const [fetchingData, setFetchingData] = useState(false);
@@ -26,10 +32,15 @@ export default function Expenditure() {
         order_no: idx + 1,
       }));
 
-      await api.put(`/expenses`, {
+      const response = await api.put(`/expenses`, {
         period_code: periodCode,
         data,
       });
+
+      const respBody = response?.data;
+      if (respBody?.is_success && respBody?.data?.refetch_liability) {
+        setRefetchLiability((prev) => prev + 1);
+      }
 
       setMasterDataTemp({ data: data, total: totalExpense });
       message.success("Expenses saved successfully!");
@@ -61,9 +72,7 @@ export default function Expenditure() {
     setFetchingData(true);
 
     try {
-      const res = await api.get(
-        `/expenses?period_code=${periodCode}`
-      );
+      const res = await api.get(`/expenses?period_code=${periodCode}`);
       const data = res.data.data.map((obj, idx) => ({
         ...obj,
         key: `${idx + 1}`,
@@ -76,9 +85,7 @@ export default function Expenditure() {
     } catch (err) {
       console.error(err);
       if (!err?.response?.data?.is_success) {
-        message.error(
-          err?.response?.data?.message || "Failed to get expenses"
-        );
+        message.error(err?.response?.data?.message || "Failed to get expenses");
       } else {
         message.error("Error get expenses:", err);
       }
@@ -93,9 +100,61 @@ export default function Expenditure() {
 
   const columns = [
     <Column
+      title="Liability"
+      dataIndex="liability_id"
+      key="liability"
+      width={80}
+      render={(_, record) => {
+        // if this row use liability
+        return (
+          <Form.Item name={[record._idx, "liability_id"]} style={{ margin: 0 }}>
+            <Select
+              style={{ width: "100%" }}
+              placeholder="Select Liability"
+              disabled={!isEdit}
+              onSelect={(value) => {
+                const selectedLiability = liabilities.find(
+                  (l) => l.id === value
+                );
+
+                if (selectedLiability) {
+                  const newData = [
+                    ...form.getFieldValue("data").map((item, idx) =>
+                      idx === record._idx
+                        ? {
+                            ...item,
+                            name: selectedLiability?.name || '',
+                            liability_id: selectedLiability?.id,
+                            value: selectedLiability?.installment || 0,
+                          }
+                        : item
+                    ),
+                  ];
+
+                  form.setFieldsValue({
+                    data: newData,
+                  });
+
+                  const total = Calculate(newData);
+                  setTotalExpense(total);
+                }
+              }}
+              autoFocus
+            >
+              {liabilities.map((liability) => (
+                <Select.Option key={liability.id} value={liability.id}>
+                  {liability.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        );
+      }}
+    />,
+    <Column
       title="Name"
       dataIndex="name"
-      width={185}
+      width={145}
       render={(_, record) => (
         <Form.Item
           name={[record._idx, "name"]}
@@ -113,7 +172,7 @@ export default function Expenditure() {
     <Column
       title="Value"
       dataIndex="value"
-      width={185}
+      width={145}
       render={(_, record) => (
         <Form.Item
           name={[record._idx, "value"]}
@@ -155,7 +214,7 @@ export default function Expenditure() {
         onSave={onSave}
         onCancel={onCancel}
         footer={footer}
-         xs={xs}
+        xs={xs}
       />
     </div>
   );
