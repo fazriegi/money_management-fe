@@ -32,9 +32,9 @@ export default function Asset() {
         data,
       });
 
-      setMasterDataTemp({ data, total: totalAsset });
+      // setMasterDataTemp({ data, total: totalAsset });
       message.success("Assets saved successfully!");
-
+      getData();
       setIsEdit((prev) => !prev);
     } catch (err) {
       if (err.errorFields) {
@@ -59,9 +59,7 @@ export default function Asset() {
     setFetchingData(true);
 
     try {
-      const res = await api.get(
-        `/assets?period_code=${periodCode}`
-      );
+      const res = await api.get(`/assets?period_code=${periodCode}`);
       const data = res.data.data.map((obj, idx) => ({
         ...obj,
         key: `${idx + 1}`,
@@ -172,7 +170,7 @@ export default function Asset() {
         onSave={onSave}
         onCancel={onCancel}
         footer={footer}
-         xs={xs}
+        xs={xs}
       />
     </div>
   );

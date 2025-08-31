@@ -37,9 +37,9 @@ export default function Liability() {
         data,
       });
 
-      setMasterDataTemp({ data: data, total: totalLiability });
+      // setMasterDataTemp({ data: data, total: totalLiability });
       message.success("Liabilities saved successfully!");
-      getData()
+      getData();
 
       setIsEdit((prev) => !prev);
     } catch (err) {
@@ -67,7 +67,7 @@ export default function Liability() {
   const deleteValidation = async (id) => {
     try {
       const res = await api.get(`/liabilities/validate-delete?id=${id}`);
-      
+
       return res?.data?.data?.is_safe;
     } catch (err) {
       console.error(err);
@@ -79,9 +79,9 @@ export default function Liability() {
         message.error("Error validate delete liability:", err);
       }
 
-      return false
+      return false;
     }
-  }
+  };
 
   const getData = async () => {
     setFetchingData(true);
@@ -116,7 +116,7 @@ export default function Liability() {
   useEffect(() => {
     getData();
   }, [periodCode, refetchLiability]);
-  
+
   const columns = [
     <Column
       title="Name"
@@ -170,7 +170,6 @@ export default function Liability() {
         <Form.Item
           name={[record._idx, "installment"]}
           style={{ margin: 0 }}
-          rules={[{ required: true, message: "" }]}
         >
           <InputCurrency
             style={{ width: "100%" }}

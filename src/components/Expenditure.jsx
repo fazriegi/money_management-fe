@@ -42,9 +42,9 @@ export default function Expenditure() {
         setRefetchLiability((prev) => prev + 1);
       }
 
-      setMasterDataTemp({ data: data, total: totalExpense });
+      // setMasterDataTemp({ data: data, total: totalExpense });
       message.success("Expenses saved successfully!");
-
+      getData();
       setIsEdit((prev) => !prev);
     } catch (err) {
       console.error(err);
@@ -123,7 +123,7 @@ export default function Expenditure() {
                       idx === record._idx
                         ? {
                             ...item,
-                            name: selectedLiability?.name || '',
+                            name: selectedLiability?.name || "",
                             liability_id: selectedLiability?.id,
                             value: selectedLiability?.installment || 0,
                           }
