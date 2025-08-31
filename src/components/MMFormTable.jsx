@@ -1,4 +1,4 @@
-import { Button, Form } from "antd";
+import { Button, Form, message } from "antd";
 import SimpleTable from "./SimpleTable";
 import Column from "antd/es/table/Column";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
@@ -15,6 +15,7 @@ export default function MMFormTable({
   isEdit,
   setIsEdit,
   xs,
+  deleteValidation,
   ...props
 }) {
   const onEditButton = (
@@ -51,8 +52,23 @@ export default function MMFormTable({
     xs ? <HamburgerModal component={onEditButton} /> : onEditButton,
   ].filter(Boolean);
 
-  const deleteRow = (key) => {
+  const deleteRow = async (key) => {
     const data = form.getFieldValue("data") || [];
+    const deletedData = data.filter((item) => item.key === key)[0];
+
+    if (deleteValidation && typeof deleteValidation === "function") {
+      if (deletedData?.id && deletedData?.id !== 0) {
+        const safe = await deleteValidation(deletedData?.id);
+
+        if (!safe) {
+          message.error(
+            "Liability cannot be deleted because it's used by expenses."
+          );
+          return;
+        }
+      }
+    }
+
     const newData = data.filter((item) => item.key !== key);
 
     form.setFieldsValue({ data: newData });

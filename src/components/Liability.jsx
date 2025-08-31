@@ -39,6 +39,7 @@ export default function Liability() {
 
       setMasterDataTemp({ data: data, total: totalLiability });
       message.success("Liabilities saved successfully!");
+      getData()
 
       setIsEdit((prev) => !prev);
     } catch (err) {
@@ -62,6 +63,25 @@ export default function Liability() {
     form.setFieldsValue({ data: masterDataTemp?.data });
     setTotalLiability(masterDataTemp?.total);
   };
+
+  const deleteValidation = async (id) => {
+    try {
+      const res = await api.get(`/liabilities/validate-delete?id=${id}`);
+      
+      return res?.data?.data?.is_safe;
+    } catch (err) {
+      console.error(err);
+      if (!err?.response?.data?.is_success) {
+        message.error(
+          err?.response?.data?.message || "Failed to validate delete liability"
+        );
+      } else {
+        message.error("Error validate delete liability:", err);
+      }
+
+      return false
+    }
+  }
 
   const getData = async () => {
     setFetchingData(true);
@@ -96,24 +116,29 @@ export default function Liability() {
   useEffect(() => {
     getData();
   }, [periodCode, refetchLiability]);
-
+  
   const columns = [
     <Column
       title="Name"
       dataIndex="name"
       width={185}
       render={(_, record) => (
-        <Form.Item
-          name={[record._idx, "name"]}
-          style={{ margin: 0 }}
-          rules={[{ required: true, message: "" }]}
-        >
-          <Input
-            style={{ width: "100%" }}
-            placeholder="Liability Name"
-            readOnly={!isEdit}
-          />
-        </Form.Item>
+        <div style={{ display: "flex", width: "100%" }}>
+          <Form.Item name={[record._idx, "id"]} hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name={[record._idx, "name"]}
+            style={{ margin: 0, flex: 1 }}
+            rules={[{ required: true, message: "" }]}
+          >
+            <Input
+              style={{ width: "100%" }}
+              placeholder="Liability Name"
+              readOnly={!isEdit}
+            />
+          </Form.Item>
+        </div>
       )}
     />,
     <Column
@@ -162,6 +187,7 @@ export default function Liability() {
         onCancel={onCancel}
         footer={footer}
         xs={xs}
+        deleteValidation={deleteValidation}
       />
     </div>
   );
