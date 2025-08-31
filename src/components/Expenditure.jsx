@@ -1,4 +1,4 @@
-import { Button, Form, Input, message, Select } from "antd";
+import { Form, Input, message, Select } from "antd";
 import { useState, useEffect } from "react";
 import Column from "antd/es/table/Column";
 import InputCurrency from "../components/InputCurrency";
@@ -6,7 +6,6 @@ import { Calculate } from "../helper/helper";
 import { useMoneyManagementContext } from "../context/MoneyManagementContext";
 import MMFormTable from "./MMFormTable";
 import api from "../helper/api";
-import { FormOutlined } from "@ant-design/icons";
 
 export default function Expenditure() {
   const {
@@ -22,7 +21,6 @@ export default function Expenditure() {
   const [fetchingData, setFetchingData] = useState(false);
   const [form] = Form.useForm();
   const [masterDataTemp, setMasterDataTemp] = useState({});
-  const [useLiability, setUseLiability] = useState(null);
 
   const onSave = async () => {
     try {
@@ -105,14 +103,15 @@ export default function Expenditure() {
       title="Liability"
       dataIndex="liability_id"
       key="liability"
-      width={useLiability !== null ? 80 : 50}
+      width={80}
       render={(_, record) => {
         // if this row use liability
-        if (useLiability === record._idx) {
-          return (
+        return (
+          <Form.Item name={[record._idx, "liability_id"]} style={{ margin: 0 }}>
             <Select
               style={{ width: "100%" }}
               placeholder="Select Liability"
+              disabled={!isEdit}
               onSelect={(value) => {
                 const selectedLiability = liabilities.find(
                   (l) => l.id === value
@@ -138,10 +137,7 @@ export default function Expenditure() {
                   const total = Calculate(newData);
                   setTotalExpense(total);
                 }
-
-                setUseLiability(null);
               }}
-              onBlur={() => setUseLiability(null)}
               autoFocus
             >
               {liabilities.map((liability) => (
@@ -150,15 +146,7 @@ export default function Expenditure() {
                 </Select.Option>
               ))}
             </Select>
-          );
-        }
-
-        return (
-          <Button
-            onClick={() => setUseLiability(record._idx)}
-            disabled={!isEdit}
-            icon={<FormOutlined />}
-          ></Button>
+          </Form.Item>
         );
       }}
     />,
