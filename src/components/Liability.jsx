@@ -121,7 +121,7 @@ export default function Liability() {
     <Column
       title="Name"
       dataIndex="name"
-      width={185}
+      width={150}
       render={(_, record) => (
         <div style={{ display: "flex", width: "100%" }}>
           <Form.Item name={[record._idx, "id"]} hidden>
@@ -144,10 +144,31 @@ export default function Liability() {
     <Column
       title="Value"
       dataIndex="value"
-      width={185}
+      width={110}
       render={(_, record) => (
         <Form.Item
           name={[record._idx, "value"]}
+          style={{ margin: 0 }}
+          rules={[{ required: true, message: "" }]}
+        >
+          <InputCurrency
+            style={{ width: "100%" }}
+            readOnly={!isEdit}
+            onChange={() => {
+              const total = Calculate(form.getFieldValue("data"));
+              setTotalLiability(total);
+            }}
+          />
+        </Form.Item>
+      )}
+    />,
+    <Column
+      title="Installment"
+      dataIndex="installment"
+      width={110}
+      render={(_, record) => (
+        <Form.Item
+          name={[record._idx, "installment"]}
           style={{ margin: 0 }}
           rules={[{ required: true, message: "" }]}
         >

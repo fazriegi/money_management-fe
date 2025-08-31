@@ -123,8 +123,9 @@ export default function Expenditure() {
                       idx === record._idx
                         ? {
                             ...item,
-                            name: selectedLiability.name,
-                            liability_id: selectedLiability.id,
+                            name: selectedLiability?.name || '',
+                            liability_id: selectedLiability?.id,
+                            value: selectedLiability?.installment || 0,
                           }
                         : item
                     ),
