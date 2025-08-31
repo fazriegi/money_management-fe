@@ -31,9 +31,9 @@ export default function Income() {
         data,
       });
 
-      setMasterDataTemp({ data, total: totalIncome });
+      // setMasterDataTemp({ data, total: totalIncome });
       message.success("Incomes saved successfully!");
-
+      getData();
       setIsEdit((prev) => !prev);
     } catch (err) {
       if (err.errorFields) {
@@ -58,9 +58,7 @@ export default function Income() {
     setFetchingData(true);
 
     try {
-      const res = await api.get(
-        `/incomes?period_code=${periodCode}`
-      );
+      const res = await api.get(`/incomes?period_code=${periodCode}`);
       const data = res.data.data.map((obj, idx) => ({
         ...obj,
         key: `${idx + 1}`,
