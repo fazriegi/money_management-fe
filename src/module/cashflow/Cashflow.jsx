@@ -23,7 +23,7 @@ function Cashflow() {
   const [tableParams, setTableParams] = useState({
     pagination: {
       current: 1,
-      pageSize: 2,
+      pageSize: 100,
     },
   });
 
