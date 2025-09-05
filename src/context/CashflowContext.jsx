@@ -4,7 +4,11 @@ export const CashflowContext = createContext({});
 
 export const CashflowProvider = ({ children }) => {
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
-  const showExpenseModal = () => {
+  const [modalData, setModalData] = useState();
+  const [refetchCashflow, setRefetchCashflow] = useState(0);
+
+  const showExpenseModal = (type = "add", id) => {
+    setModalData({ type, id });
     setIsExpenseModalOpen(true);
   };
 
@@ -12,6 +16,9 @@ export const CashflowProvider = ({ children }) => {
     isExpenseModalOpen,
     setIsExpenseModalOpen,
     showExpenseModal,
+    modalData,
+    refetchCashflow,
+    setRefetchCashflow,
   };
 
   return (
