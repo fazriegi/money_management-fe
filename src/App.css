@@ -1,6 +1,5 @@
 #container {
   margin: 0;
-  min-height: 100vh;
 }
 
 #money-management {
@@ -35,10 +34,10 @@
   gap: 1.5em;
 }
 
-.right-align-input input {
+/* .right-align-input input {
   text-align: right !important;
   text-align-last: right !important;
-}
+} */
 
 .glass-dark {
   background: rgba(0, 0, 0, 0.4);
