@@ -35,7 +35,6 @@ export default function SimpleTable({
       footer={() => footer || undefined}
       scroll={{
         x: 500,
-        y: 260,
       }}
       {...props}
     >
