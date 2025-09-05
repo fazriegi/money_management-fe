@@ -17,7 +17,7 @@ const getRandomuserParams = (params) => ({
 });
 
 function Cashflow() {
-  const { showExpenseModal } = useCashflowContext();
+  const { showExpenseModal, refetchCashflow } = useCashflowContext();
   const [fetchingData, setFetchingData] = useState(false);
   const [dataList, setDataList] = useState([]);
   const [tableParams, setTableParams] = useState({
@@ -82,7 +82,7 @@ function Cashflow() {
 
   useEffect(() => {
     getData();
-  }, [JSON.stringify(tableParams)]);
+  }, [JSON.stringify(tableParams), refetchCashflow]);
 
   const extraButton = [
     <Button key="add-income" icon={<PlusOutlined />}>
@@ -121,7 +121,7 @@ function Cashflow() {
           onRow={(record) => ({
             onClick: () => {
               if (record.type === "expense") {
-                showExpenseModal();
+                showExpenseModal("edit", record?.id);
               }
             },
           })}
