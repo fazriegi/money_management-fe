@@ -7,12 +7,8 @@ import { useCashflowContext } from "src/context/CashflowContext";
 import api from "src/helper/api";
 
 const IncomeModal = () => {
-  const {
-    openFormModal,
-    setOpenFormModal,
-    modalData,
-    setRefetchCashflow,
-  } = useCashflowContext();
+  const { openFormModal, setOpenFormModal, modalData, setRefetchCashflow } =
+    useCashflowContext();
 
   const [form] = Form.useForm();
   const [listCategory, setListCategory] = useState([]);
@@ -39,6 +35,7 @@ const IncomeModal = () => {
         });
       }
 
+      message.success(`success ${modalData?.type} income`);
       setRefetchCashflow((prev) => prev + 1);
     } catch (err) {
       if (!err?.response?.data?.is_success) {
@@ -49,7 +46,7 @@ const IncomeModal = () => {
         message.error(`Error ${modalData?.type} income:`, err);
       }
     } finally {
-      setOpenFormModal(false);
+      setOpenFormModal(null);
       setLoading(false);
     }
   };
@@ -58,9 +55,34 @@ const IncomeModal = () => {
     form.submit();
   };
 
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      await api.delete(`/income/${modalData?.id}`);
+
+      message.success("success delete income");
+      setRefetchCashflow((prev) => prev + 1);
+    } catch (err) {
+      if (!err?.response?.data?.is_success) {
+        message.error(
+          err?.response?.data?.message || `Failed to delete income`
+        );
+      } else {
+        message.error(`Error delete income:`, err);
+      }
+    } finally {
+      setOpenFormModal(null);
+      setLoading(false);
+      form.resetFields();
+    }
+  };
+
   const handleCancel = () => {
-    setOpenFormModal(false);
-    form.resetFields();
+    Modal.warning({
+      title: "Delete",
+      content: "Are you sure want to delete this income?",
+      onOk: handleDelete,
+    });
   };
 
   const getData = async () => {
@@ -80,6 +102,7 @@ const IncomeModal = () => {
       }
     }
   };
+
   const getDataCategory = async () => {
     try {
       const res = await api.get(`/income/category`);
@@ -98,7 +121,7 @@ const IncomeModal = () => {
   };
 
   useEffect(() => {
-    if (openFormModal) {
+    if (openFormModal === "income") {
       form.resetFields();
       getDataCategory();
 
@@ -112,10 +135,15 @@ const IncomeModal = () => {
     <>
       <Modal
         title="Income"
-        open={openFormModal === 'income'}
+        open={openFormModal === "income"}
         onOk={handleOk}
         okText="Save"
         onCancel={handleCancel}
+        cancelText="Delete"
+        cancelButtonProps={{
+          danger: true,
+          disabled: modalData?.type === "add",
+        }}
         loading={loading}
       >
         <Form
