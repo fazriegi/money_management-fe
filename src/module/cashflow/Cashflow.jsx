@@ -9,6 +9,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import api from "../../helper/api";
 import qs from "qs";
+import IncomeModal from "./components/IncomeModal";
 
 const getRandomuserParams = (params) => ({
   limit: params.pagination?.pageSize,
@@ -17,7 +18,7 @@ const getRandomuserParams = (params) => ({
 });
 
 function Cashflow() {
-  const { showExpenseModal, refetchCashflow } = useCashflowContext();
+  const { showModal, refetchCashflow } = useCashflowContext();
   const [fetchingData, setFetchingData] = useState(false);
   const [dataList, setDataList] = useState([]);
   const [tableParams, setTableParams] = useState({
@@ -85,13 +86,17 @@ function Cashflow() {
   }, [JSON.stringify(tableParams), refetchCashflow]);
 
   const extraButton = [
-    <Button key="add-income" icon={<PlusOutlined />}>
+    <Button
+      key="add-income"
+      icon={<PlusOutlined />}
+      onClick={() => showModal("add", "income")}
+    >
       Income
     </Button>,
     <Button
       key="add-expense"
       icon={<PlusOutlined />}
-      onClick={showExpenseModal}
+      onClick={() => showModal("add", "expense")}
     >
       Expense
     </Button>,
@@ -121,7 +126,9 @@ function Cashflow() {
           onRow={(record) => ({
             onClick: () => {
               if (record.type === "expense") {
-                showExpenseModal("edit", record?.id);
+                showModal("edit", "expense", record?.id);
+              } else {
+                showModal("edit", "income", record?.id);
               }
             },
           })}
@@ -160,6 +167,7 @@ function Cashflow() {
           />
         </SimpleTable>
         <ExpenseModal />
+        <IncomeModal />
       </div>
     </div>
   );

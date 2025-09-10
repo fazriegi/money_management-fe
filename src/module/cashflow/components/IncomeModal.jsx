@@ -1,12 +1,12 @@
-import { Button, DatePicker, Form, message, Modal, Select } from "antd";
-import React, { useContext, useEffect, useState } from "react";
-import { useCashflowContext } from "../../context/CashflowContext";
-import InputCurrency from "../../components/InputCurrency";
+import { DatePicker, Form, message, Modal, Select } from "antd";
+import React, { useEffect, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
-import api from "../../helper/api";
 import moment from "moment";
+import { useCashflowContext } from "../../../context/CashflowContext";
+import api from "../../../helper/api";
+import InputCurrency from "../../../components/InputCurrency";
 
-const ExpenseModal = () => {
+const IncomeModal = () => {
   const {
     openFormModal,
     setOpenFormModal,
@@ -30,11 +30,11 @@ const ExpenseModal = () => {
         .format("YYYY-MM-DD HH:mm:ss");
 
       if (modalData?.type === "add") {
-        await api.post("/expense", {
+        await api.post("/income", {
           ...values,
         });
       } else {
-        await api.put(`/expense/${modalData?.id}`, {
+        await api.put(`/income/${modalData?.id}`, {
           ...values,
         });
       }
@@ -43,30 +43,29 @@ const ExpenseModal = () => {
     } catch (err) {
       if (!err?.response?.data?.is_success) {
         message.error(
-          err?.response?.data?.message || `Failed to ${modalData?.type} expense`
+          err?.response?.data?.message || `Failed to ${modalData?.type} income`
         );
       } else {
-        message.error(`Error ${modalData?.type} expense:`, err);
+        message.error(`Error ${modalData?.type} income:`, err);
       }
     } finally {
-      setOpenFormModal(null);
+      setOpenFormModal(false);
       setLoading(false);
     }
   };
 
   const handleOk = () => {
     form.submit();
-    // setOpenFormModal(null);
   };
 
   const handleCancel = () => {
-    setOpenFormModal(null);
+    setOpenFormModal(false);
     form.resetFields();
   };
 
   const getData = async () => {
     try {
-      const res = await api.get(`/expense/${modalData?.id ?? 0}`);
+      const res = await api.get(`/income/${modalData?.id ?? 0}`);
 
       const respData = res.data.data;
       form.setFieldsValue({
@@ -75,15 +74,15 @@ const ExpenseModal = () => {
       });
     } catch (err) {
       if (!err?.response?.data?.is_success) {
-        message.error(err?.response?.data?.message || "Failed to get expense");
+        message.error(err?.response?.data?.message || "Failed to get income");
       } else {
-        message.error("Error get expense:", err);
+        message.error("Error get income:", err);
       }
     }
   };
   const getDataCategory = async () => {
     try {
-      const res = await api.get(`/expense/category`);
+      const res = await api.get(`/income/category`);
 
       const respData = res.data.data;
       setListCategory(respData);
@@ -112,8 +111,8 @@ const ExpenseModal = () => {
   return (
     <>
       <Modal
-        title="Expense"
-        open={openFormModal === 'expense'}
+        title="Income"
+        open={openFormModal === 'income'}
         onOk={handleOk}
         okText="Save"
         onCancel={handleCancel}
@@ -184,4 +183,4 @@ const ExpenseModal = () => {
     </>
   );
 };
-export default ExpenseModal;
+export default IncomeModal;
