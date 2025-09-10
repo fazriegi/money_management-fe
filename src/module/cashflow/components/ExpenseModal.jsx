@@ -1,18 +1,14 @@
-import { Button, DatePicker, Form, message, Modal, Select } from "antd";
-import React, { useContext, useEffect, useState } from "react";
-import { useCashflowContext } from "../../context/CashflowContext";
-import InputCurrency from "../../components/InputCurrency";
+import { DatePicker, Form, message, Modal, Select } from "antd";
+import React, { useEffect, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
-import api from "../../helper/api";
 import moment from "moment";
+import InputCurrency from "src/components/InputCurrency";
+import { useCashflowContext } from "src/context/CashflowContext";
+import api from "src/helper/api";
 
 const ExpenseModal = () => {
-  const {
-    isExpenseModalOpen,
-    setIsExpenseModalOpen,
-    modalData,
-    setRefetchCashflow,
-  } = useCashflowContext();
+  const { openFormModal, setOpenFormModal, modalData, setRefetchCashflow } =
+    useCashflowContext();
 
   const [form] = Form.useForm();
   const [listCategory, setListCategory] = useState([]);
@@ -39,6 +35,7 @@ const ExpenseModal = () => {
         });
       }
 
+      message.success(`success ${modalData?.type} expense`)
       setRefetchCashflow((prev) => prev + 1);
     } catch (err) {
       if (!err?.response?.data?.is_success) {
@@ -49,19 +46,43 @@ const ExpenseModal = () => {
         message.error(`Error ${modalData?.type} expense:`, err);
       }
     } finally {
-      setIsExpenseModalOpen(false);
+      setOpenFormModal(null);
       setLoading(false);
     }
   };
 
   const handleOk = () => {
     form.submit();
-    // setIsExpenseModalOpen(false);
+  };
+
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      await api.delete(`/expense/${modalData?.id}`);
+
+      message.success("success delete expense")
+      setRefetchCashflow((prev) => prev + 1);
+    } catch (err) {
+      if (!err?.response?.data?.is_success) {
+        message.error(
+          err?.response?.data?.message || `Failed to delete expense`
+        );
+      } else {
+        message.error(`Error delete expense:`, err);
+      }
+    } finally {
+      setOpenFormModal(null);
+      setLoading(false);
+      form.resetFields();
+    }
   };
 
   const handleCancel = () => {
-    setIsExpenseModalOpen(false);
-    form.resetFields();
+    Modal.warning({
+      title: 'Delete',
+      content: 'Are you sure want to delete this expense?',
+      onOk: handleDelete,
+    });
   };
 
   const getData = async () => {
@@ -99,7 +120,7 @@ const ExpenseModal = () => {
   };
 
   useEffect(() => {
-    if (isExpenseModalOpen) {
+    if (openFormModal === 'expense') {
       form.resetFields();
       getDataCategory();
 
@@ -107,16 +128,21 @@ const ExpenseModal = () => {
         getData();
       }
     }
-  }, [isExpenseModalOpen, modalData]);
+  }, [openFormModal, modalData]);
 
   return (
     <>
       <Modal
         title="Expense"
-        open={isExpenseModalOpen}
+        open={openFormModal === "expense"}
         onOk={handleOk}
         okText="Save"
         onCancel={handleCancel}
+        cancelText="Delete"
+        cancelButtonProps={{
+          danger: true,
+          disabled: modalData?.type === 'add',
+        }}
         loading={loading}
       >
         <Form

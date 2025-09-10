@@ -3,20 +3,21 @@ import { createContext, useContext, useState } from "react";
 export const CashflowContext = createContext({});
 
 export const CashflowProvider = ({ children }) => {
-  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [openFormModal, setOpenFormModal] = useState(null);
   const [modalData, setModalData] = useState();
   const [refetchCashflow, setRefetchCashflow] = useState(0);
 
-  const showExpenseModal = (type = "add", id) => {
+  const showModal = (type = "add", modalType, id) => {
     setModalData({ type, id });
-    setIsExpenseModalOpen(true);
+    setOpenFormModal(modalType);
   };
 
   const value = {
-    isExpenseModalOpen,
-    setIsExpenseModalOpen,
-    showExpenseModal,
+    openFormModal,
+    setOpenFormModal,
+    showModal,
     modalData,
+    setModalData,
     refetchCashflow,
     setRefetchCashflow,
   };
