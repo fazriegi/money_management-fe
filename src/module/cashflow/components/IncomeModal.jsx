@@ -2,9 +2,9 @@ import { DatePicker, Form, message, Modal, Select } from "antd";
 import React, { useEffect, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
 import moment from "moment";
-import { useCashflowContext } from "../../../context/CashflowContext";
-import api from "../../../helper/api";
-import InputCurrency from "../../../components/InputCurrency";
+import InputCurrency from "src/components/InputCurrency";
+import { useCashflowContext } from "src/context/CashflowContext";
+import api from "src/helper/api";
 
 const IncomeModal = () => {
   const {
