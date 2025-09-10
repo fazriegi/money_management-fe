@@ -1,15 +1,15 @@
 import { Button, message, Typography } from "antd";
 import moment from "moment";
-import InputCurrency from "../../components/InputCurrency";
-import { useCashflowContext } from "../../context/CashflowContext";
-import ExpenseModal from "./ExpenseModal";
+import ExpenseModal from "./components/ExpenseModal";
 import Column from "antd/es/table/Column";
-import SimpleTable from "../../components/SimpleTable";
 import { PlusOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import api from "../../helper/api";
 import qs from "qs";
 import IncomeModal from "./components/IncomeModal";
+import InputCurrency from "src/components/InputCurrency";
+import { useCashflowContext } from "src/context/CashflowContext";
+import SimpleTable from "src/components/SimpleTable";
+import api from "src/helper/api";
 
 const getRandomuserParams = (params) => ({
   limit: params.pagination?.pageSize,
