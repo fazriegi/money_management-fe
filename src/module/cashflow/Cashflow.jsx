@@ -36,9 +36,14 @@ function Cashflow() {
   const [tableParams, setTableParams] = useState({
     pagination: {
       current: 1,
-      pageSize: 100,
+      pageSize: 5,
       total: 0,
     },
+  });
+  const [total, setTotal] = useState({
+    income: 0,
+    expense: 0,
+    cashflow: 0,
   });
 
   const getData = async () => {
@@ -53,12 +58,17 @@ function Cashflow() {
       );
 
       const respData = res.data.data;
-      const data = respData.data.map((obj, idx) => ({
+      const data = respData.cashflow.data.map((obj, idx) => ({
         ...obj,
         key: `${idx + 1}`,
       }));
 
       setDataList(data);
+      setTotal({
+        income: respData.cashflow.total_income,
+        expense: respData.cashflow.total_expense,
+        cashflow: respData.cashflow.total_cashflow,
+      });
       setTableParams((prev) => {
         if (prev.pagination.total === respData.total) return prev;
         return {
@@ -142,6 +152,36 @@ function Cashflow() {
     </Button>,
   ];
 
+  const footer = (
+    <>
+      <Typography.Text strong style={{ fontSize: "1.2em" }}>
+        Total
+      </Typography.Text>
+      <div style={{ display: "flex", gap: "1em" }}>
+        <InputCurrency
+          label="Income: "
+          value={total.income}
+          labelUp={true}
+          readOnly
+        />
+        <InputCurrency
+          label="Expense: "
+          value={total.expense}
+          labelUp={true}
+          status="error"
+          readOnly
+        />
+        <InputCurrency
+          label="Cashflow: "
+          value={total.cashflow}
+          labelUp={true}
+          {...(total.cashflow < 0 ? { status: "error" } : {})}
+          readOnly
+        />
+      </div>
+    </>
+  );
+
   return (
     <div style={{ marginTop: "3em" }}>
       {fetchingPeriod ? (
@@ -185,6 +225,7 @@ function Cashflow() {
                 pagination={tableParams.pagination}
                 onChange={handleTableChange}
                 tableLayout="fixed"
+                footer={footer}
                 onRow={(record) => ({
                   onClick: () => {
                     if (record.type === "expense") {
