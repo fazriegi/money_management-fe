@@ -3,7 +3,7 @@ import moment from "moment";
 import ExpenseModal from "./components/ExpenseModal";
 import Column from "antd/es/table/Column";
 import { PlusOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import qs from "qs";
 import IncomeModal from "./components/IncomeModal";
 import InputCurrency from "src/components/InputCurrency";
@@ -12,7 +12,7 @@ import SimpleTable from "src/components/SimpleTable";
 import api from "src/helper/api";
 import dayjs from "dayjs";
 
-const getRandomuserParams = (params) => ({
+const getApiParam = (params) => ({
   limit: params.pagination?.pageSize,
   page: params.pagination?.current,
   ...params,
@@ -46,16 +46,24 @@ function Cashflow() {
     cashflow: 0,
   });
 
-  const getData = async () => {
+  const periodRef = useRef();
+  periodRef.current = period;
+
+  const getData = async (params = tableParams) => {
     try {
+      if (!periodRef.current?.start || !periodRef.current?.end) {
+        return;
+      }
+
       setFetchingData(true);
-      const res = await api.get(
-        `/cashflow?${qs.stringify(
-          getRandomuserParams(tableParams)
-        )}&start_date=${period?.start?.format(
-          "YYYY-MM-DD"
-        )}&end_date=${period?.end?.format("YYYY-MM-DD")}`
-      );
+
+      const apiParams = {
+        ...getApiParam(params),
+        start_date: periodRef.current.start.format("YYYY-MM-DD"),
+        end_date: periodRef.current.end.format("YYYY-MM-DD"),
+      };
+
+      const res = await api.get(`/cashflow?${qs.stringify(apiParams)}`);
 
       const respData = res.data.data;
       const data = respData.cashflow.data.map((obj, idx) => ({
@@ -69,13 +77,14 @@ function Cashflow() {
         expense: respData.cashflow.total_expense,
         cashflow: respData.cashflow.total_cashflow,
       });
-      setTableParams((prev) => {
-        if (prev.pagination.total === respData.total) return prev;
-        return {
-          ...prev,
-          pagination: { ...prev.pagination, total: respData.total },
-        };
-      });
+
+      setTableParams((prev) => ({
+        ...prev,
+        pagination: {
+          ...prev.pagination,
+          total: respData.total,
+        },
+      }));
     } catch (err) {
       if (!err?.response?.data?.is_success) {
         message.error(err?.response?.data?.message || "Failed to get cashflow");
@@ -114,11 +123,14 @@ function Cashflow() {
       .map((s) => `${s.field} ${s.order === "ascend" ? "asc" : "desc"}`)
       .join(", ");
 
-    setTableParams({
+    const newParams = {
       pagination,
       filters,
       sort: sortString || "date desc",
-    });
+    };
+
+    setTableParams(newParams);
+    getData(newParams);
   };
 
   useEffect(() => {
@@ -126,14 +138,25 @@ function Cashflow() {
   }, []);
 
   useEffect(() => {
-    if (period?.start && period?.end) getData();
-  }, [
-    period,
-    tableParams.pagination.current,
-    tableParams.pagination.pageSize,
-    tableParams?.sort,
-    refetchCashflow,
-  ]);
+    if (period?.start && period?.end) {
+      const resetParams = {
+        ...tableParams,
+        pagination: {
+          ...tableParams.pagination,
+          current: 1,
+        },
+      };
+
+      setTableParams(resetParams);
+      getData(resetParams);
+    }
+  }, [period]);
+
+  useEffect(() => {
+    if (refetchCashflow > 0) {
+      getData();
+    }
+  }, [refetchCashflow]);
 
   const extraButton = [
     <Button
