@@ -121,6 +121,7 @@ function Cashflow() {
     period,
     tableParams.pagination.current,
     tableParams.pagination.pageSize,
+    tableParams?.sort,
     refetchCashflow,
   ]);
 
