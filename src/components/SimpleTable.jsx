@@ -29,7 +29,6 @@ export default function SimpleTable({
     <Table
       bordered
       dataSource={dataSource}
-      pagination={false}
       style={style}
       title={isUseTitle ? renderTitle : undefined}
       footer={() => footer || undefined}

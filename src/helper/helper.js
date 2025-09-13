@@ -22,3 +22,29 @@ export const Calculate = (listData = [], multiplierField = "") => {
     return sum + numeric * multiplier;
   }, 0);
 };
+
+/**
+ * Get the start and end date of a period based on a given start day of the month.
+ *
+ * @param {Date} selectedDate - The reference date used to calculate the period.
+ * @param {number} startDayOfMonth - The day of the month that marks the start of each period.
+ * @returns {{ periodStart: Date, periodEnd: Date }} The calculated period start and end dates.
+ */
+export function getPeriodRange(selectedDate, startDayOfMonth) {
+  if (startDayOfMonth === 1) {
+    return [selectedDate.startOf("month"), selectedDate.endOf("month")];
+  }
+
+  const periodStart = selectedDate.set("date", startDayOfMonth);
+
+  // if selectedDate < periodStart, still in the previous range
+  // so periodStart must be moved back 1 month
+  let finalStart = periodStart;
+  if (selectedDate.isBefore(periodStart)) {
+    finalStart = periodStart.subtract(1, "month");
+  }
+
+  const periodEnd = finalStart.add(1, "month").set("date", startDayOfMonth - 1);
+
+  return [finalStart, periodEnd];
+}
