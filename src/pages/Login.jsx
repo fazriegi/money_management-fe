@@ -22,7 +22,7 @@ const Login = () => {
 
       if (respBody?.is_success) {
         localStorage.setItem("USER", JSON.stringify(respBody?.data));
-        navigate("/money-management");
+        navigate("/cashflow");
       }
     } catch (err) {
       message.error(
