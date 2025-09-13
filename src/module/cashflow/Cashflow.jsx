@@ -1,4 +1,4 @@
-import { Button, DatePicker, message, Spin, Typography } from "antd";
+import { Button, DatePicker, Grid, message, Spin, Typography } from "antd";
 import moment from "moment";
 import ExpenseModal from "./components/ExpenseModal";
 import Column from "antd/es/table/Column";
@@ -18,6 +18,8 @@ const getApiParam = (params) => ({
   ...params,
 });
 
+const { useBreakpoint } = Grid;
+
 function Cashflow() {
   const {
     showModal,
@@ -29,6 +31,8 @@ function Cashflow() {
     firstDayOfMonth,
     setFirstDayOfMonth,
   } = useCashflowContext();
+
+  const { xs } = useBreakpoint();
 
   const [fetchingPeriod, setFetchingPeriod] = useState(false);
   const [fetchingData, setFetchingData] = useState(false);
@@ -180,7 +184,13 @@ function Cashflow() {
       <Typography.Text strong style={{ fontSize: "1.2em" }}>
         Total
       </Typography.Text>
-      <div style={{ display: "flex", gap: "1em" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: xs ? "column" : "row",
+          gap: "1em",
+        }}
+      >
         <InputCurrency
           label="Income: "
           value={total.income}
