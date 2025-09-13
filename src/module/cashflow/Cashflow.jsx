@@ -43,7 +43,6 @@ function Cashflow() {
 
   const getData = async () => {
     try {
-      console.log("first");
       setFetchingData(true);
       const res = await api.get(
         `/cashflow?${qs.stringify(
