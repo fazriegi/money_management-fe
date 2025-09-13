@@ -11,6 +11,7 @@ import { useCashflowContext } from "src/context/CashflowContext";
 import SimpleTable from "src/components/SimpleTable";
 import api from "src/helper/api";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 
 const getApiParam = (params) => ({
   limit: params.pagination?.pageSize,
@@ -33,6 +34,8 @@ function Cashflow() {
   } = useCashflowContext();
 
   const { xs } = useBreakpoint();
+
+  const navigate = useNavigate();
 
   const [fetchingPeriod, setFetchingPeriod] = useState(false);
   const [fetchingData, setFetchingData] = useState(false);
@@ -92,6 +95,10 @@ function Cashflow() {
     } catch (err) {
       if (!err?.response?.data?.is_success) {
         message.error(err?.response?.data?.message || "Failed to get cashflow");
+
+        if (err?.response?.data?.code === 401) {
+          navigate("/login");
+        }
       } else {
         message.error("Error get cashflow:", err);
       }
@@ -111,6 +118,10 @@ function Cashflow() {
     } catch (err) {
       if (!err?.response?.data?.is_success) {
         message.error(err?.response?.data?.message || "Failed to get period");
+
+        if (err?.response?.data?.code === 401) {
+          navigate("/login");
+        }
       } else {
         message.error("Error get period:", err);
       }
