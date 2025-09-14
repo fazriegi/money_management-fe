@@ -5,7 +5,7 @@ import { BASE_URL } from "../constant/Constant";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Login = ({ setUser }) => {
+const Login = () => {
   const [isSubmit, setIsSubmit] = useState(false);
   const navigate = useNavigate();
 
@@ -21,7 +21,6 @@ const Login = ({ setUser }) => {
 
       if (respBody?.is_success) {
         localStorage.setItem("USER", JSON.stringify(respBody?.data));
-        setUser(respBody.data.user);
         navigate("/");
       }
     } catch (err) {

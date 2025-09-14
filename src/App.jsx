@@ -30,19 +30,20 @@ const { Header, Content } = Layout;
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
 
-function MainLayout({ user, setUser, children }) {
+function MainLayout({ children }) {
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const { xs } = useBreakpoint();
 
   const navigate = useNavigate();
 
+  const user = JSON.parse(localStorage.getItem("USER"));
+
   const toggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
   };
 
   const handleLogout = () => {
-    setUser();
     localStorage.clear();
     navigate("/login");
   };
@@ -149,7 +150,7 @@ function MainLayout({ user, setUser, children }) {
 
         <Space>
           <Avatar size="default" icon={<UserOutlined />} />
-          <Text strong>{user?.name}</Text>
+          <Text strong>{user?.user?.name}</Text>
         </Space>
       </Header>
 
@@ -222,7 +223,6 @@ function MainLayout({ user, setUser, children }) {
 function App() {
   const location = useLocation();
   const isLoginPage = location.pathname === "/login";
-  const [user, setUser] = useState();
 
   return (
     <ConfigProvider
@@ -231,7 +231,7 @@ function App() {
       }}
     >
       {!isLoginPage ? (
-        <MainLayout user={user} setUser={setUser}>
+        <MainLayout>
           <div id="container">
             <Routes>
               <Route
@@ -257,7 +257,7 @@ function App() {
       ) : (
         <div id="container">
           <Routes>
-            <Route path="/login" element={<Login setUser={setUser} />} />
+            <Route path="/login" element={<Login />} />
           </Routes>
         </div>
       )}
