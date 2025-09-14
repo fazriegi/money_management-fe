@@ -6,6 +6,7 @@ import {
   Grid,
   Layout,
   Menu,
+  message,
   Space,
   theme,
   Typography,
@@ -43,6 +44,7 @@ function MainLayout({ children }) {
 
   const handleLogout = () => {
     localStorage.clear();
+    message.success("Sign out successful");
     navigate("/login");
   };
 
@@ -110,7 +112,7 @@ function MainLayout({ children }) {
             {
               key: "logout",
               icon: <LogoutOutlined />,
-              label: "Logout",
+              label: "Sign Out",
               onClick: handleLogout,
             },
           ]}
