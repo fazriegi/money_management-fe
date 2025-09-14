@@ -51,7 +51,7 @@
 }
 
 .glass-container {
-  background: rgba(0, 67, 105, 0.1);
+  background: rgb(20, 20, 20);
   backdrop-filter: blur(10px);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
