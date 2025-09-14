@@ -19,8 +19,6 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate, Route, Routes } from "react-router-dom";
-import { MoneyManagementProvider } from "src/context/MoneyManagementContext";
-import MoneyManagement from "src/pages/MoneyManagement";
 import Login from "src/pages/Login";
 import Cashflow from "src//module/cashflow/Cashflow";
 import { CashflowProvider } from "src/context/CashflowContext";
@@ -187,7 +185,7 @@ function MainLayout({ children }) {
       {/* Main Content */}
       <Layout
         style={{
-          marginLeft: !xs ? 130 : 0,
+          marginLeft: !xs ? 110 : 0,
           transition: "margin-left 0.2s",
         }}
       >
@@ -240,14 +238,6 @@ function App() {
                   <CashflowProvider>
                     <Cashflow />
                   </CashflowProvider>
-                }
-              />
-              <Route
-                path="/money-management"
-                element={
-                  <MoneyManagementProvider>
-                    <MoneyManagement />
-                  </MoneyManagementProvider>
                 }
               />
               <Route path="/" element={<Home />} />
