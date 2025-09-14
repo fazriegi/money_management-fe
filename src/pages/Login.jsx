@@ -1,4 +1,4 @@
-import { UserOutlined } from "@ant-design/icons";
+import { KeyOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Typography } from "antd";
 import axios from "axios";
 import { BASE_URL } from "../constant/Constant";
@@ -59,7 +59,7 @@ const Login = () => {
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
-            <Input.Password placeholder="Password" size="large" />
+            <Input.Password placeholder="Password" size="large" prefix={<KeyOutlined />} />
           </Form.Item>
 
           <Form.Item label={null}>
