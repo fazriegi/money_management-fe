@@ -1,4 +1,4 @@
-import { DatePicker, Form, message, Modal, Select } from "antd";
+import { Button, DatePicker, Form, message, Modal, Select } from "antd";
 import React, { useEffect, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
 import moment from "moment";
@@ -77,12 +77,22 @@ const IncomeModal = () => {
     }
   };
 
-  const handleCancel = () => {
-    Modal.warning({
+  const onDelete = () => {
+    Modal.confirm({
       title: "Delete",
-      content: "Are you sure want to delete this income?",
+      content: "Are you sure want to delete this expense?",
       onOk: handleDelete,
+      okText: "Delete",
+      okButtonProps: {
+        danger: true,
+      },
+      cancelText: "Cancel",
     });
+  };
+
+  const handleCancel = () => {
+    setOpenFormModal(null);
+    form.resetFields();
   };
 
   const getData = async () => {
@@ -139,12 +149,20 @@ const IncomeModal = () => {
         onOk={handleOk}
         okText="Save"
         onCancel={handleCancel}
-        cancelText="Delete"
-        cancelButtonProps={{
-          danger: true,
-          disabled: modalData?.type === "add",
-        }}
         loading={loading}
+        footer={[
+          <Button
+            key="delete"
+            onClick={onDelete}
+            danger
+            disabled={modalData?.type === "add"}
+          >
+            Delete
+          </Button>,
+          <Button key="customOk" type="primary" onClick={handleOk}>
+            Save
+          </Button>,
+        ]}
       >
         <Form
           form={form}

@@ -12,6 +12,8 @@ import SimpleTable from "src/components/SimpleTable";
 import api from "src/helper/api";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
+import { DATEFORMAT } from "src/constant/Constant";
+import Period from "src/components/Period";
 
 const getApiParam = (params) => ({
   limit: params.pagination?.pageSize,
@@ -37,13 +39,13 @@ function Cashflow() {
 
   const navigate = useNavigate();
 
-  const [fetchingPeriod, setFetchingPeriod] = useState(false);
   const [fetchingData, setFetchingData] = useState(false);
   const [dataList, setDataList] = useState([]);
+  const [periodInfo, setPeriodInfo] = useState("");
   const [tableParams, setTableParams] = useState({
     pagination: {
       current: 1,
-      pageSize: 5,
+      pageSize: 50,
       total: 0,
     },
   });
@@ -109,7 +111,6 @@ function Cashflow() {
 
   const getMonthlyPeriod = async () => {
     try {
-      setFetchingPeriod(true);
       const res = await api.get("/period");
       const respData = res.data.data;
 
@@ -125,8 +126,6 @@ function Cashflow() {
       } else {
         message.error("Error get period:", err);
       }
-    } finally {
-      setFetchingPeriod(false);
     }
   };
 
@@ -154,6 +153,10 @@ function Cashflow() {
 
   useEffect(() => {
     if (period?.start && period?.end) {
+      const startDate = period?.start?.format(DATEFORMAT);
+      const endDate = period?.end?.format(DATEFORMAT);
+
+      setPeriodInfo(`${startDate} - ${endDate}`);
       const resetParams = {
         ...tableParams,
         pagination: {
@@ -228,10 +231,31 @@ function Cashflow() {
 
   return (
     <div style={{ marginTop: "3em" }}>
-      {fetchingPeriod ? (
+      {periodInfo === "" ? (
         <Spin />
       ) : (
         <div>
+          <div
+            style={
+              !xs
+                ? {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    margin: "1em",
+                  }
+                : { margin: "2em" }
+            }
+          >
+            <Typography.Title level={xs ? 3 : 2} style={{ margin: 0 }}>
+              Cashflow
+            </Typography.Title>
+            <Period
+              period={periodInfo}
+              style={{ fontSize: xs ? "1.2em" : "1.5em", fontWeight: "bold" }}
+            />
+          </div>
+
           <div
             style={{
               display: "flex",
@@ -288,7 +312,7 @@ function Cashflow() {
                   sorter={{ multiple: 1 }}
                   render={(val) => (
                     <Typography.Text>
-                      {moment(val).format("DD-MM-YYYY")}
+                      {moment(val).format(DATEFORMAT)}
                     </Typography.Text>
                   )}
                 />
