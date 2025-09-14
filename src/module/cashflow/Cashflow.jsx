@@ -247,12 +247,12 @@ function Cashflow() {
                 : { margin: "2em" }
             }
           >
-            <Typography.Title level={xs ? 3 : 2} style={{ margin: 0 }}>
+            <Typography.Title level={xs ? 4 : 3} style={{ margin: 0 }}>
               Cashflow
             </Typography.Title>
             <Period
               period={periodInfo}
-              style={{ fontSize: xs ? "1.2em" : "1.5em", fontWeight: "bold" }}
+              style={{ fontSize: xs ? "1.2em" : "1.4em", fontWeight: "bold" }}
             />
           </div>
 
