@@ -1,12 +1,11 @@
 import { UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Typography } from "antd";
-import Password from "antd/es/input/Password";
 import axios from "axios";
 import { BASE_URL } from "../constant/Constant";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
+const Login = ({ setUser }) => {
   const [isSubmit, setIsSubmit] = useState(false);
   const navigate = useNavigate();
 
@@ -22,7 +21,8 @@ const Login = () => {
 
       if (respBody?.is_success) {
         localStorage.setItem("USER", JSON.stringify(respBody?.data));
-        navigate("/cashflow");
+        setUser(respBody.data.user);
+        navigate("/");
       }
     } catch (err) {
       message.error(
