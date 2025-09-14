@@ -1,6 +1,5 @@
 import { UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Typography } from "antd";
-import Password from "antd/es/input/Password";
 import axios from "axios";
 import { BASE_URL } from "../constant/Constant";
 import { useState } from "react";
@@ -22,7 +21,7 @@ const Login = () => {
 
       if (respBody?.is_success) {
         localStorage.setItem("USER", JSON.stringify(respBody?.data));
-        navigate("/money-management");
+        navigate("/");
       }
     } catch (err) {
       message.error(

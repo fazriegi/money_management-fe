@@ -1,4 +1,4 @@
-import { Button, DatePicker, message, Spin, Typography } from "antd";
+import { Button, DatePicker, Grid, message, Spin, Typography } from "antd";
 import moment from "moment";
 import ExpenseModal from "./components/ExpenseModal";
 import Column from "antd/es/table/Column";
@@ -11,12 +11,15 @@ import { useCashflowContext } from "src/context/CashflowContext";
 import SimpleTable from "src/components/SimpleTable";
 import api from "src/helper/api";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 
 const getApiParam = (params) => ({
   limit: params.pagination?.pageSize,
   page: params.pagination?.current,
   ...params,
 });
+
+const { useBreakpoint } = Grid;
 
 function Cashflow() {
   const {
@@ -29,6 +32,10 @@ function Cashflow() {
     firstDayOfMonth,
     setFirstDayOfMonth,
   } = useCashflowContext();
+
+  const { xs } = useBreakpoint();
+
+  const navigate = useNavigate();
 
   const [fetchingPeriod, setFetchingPeriod] = useState(false);
   const [fetchingData, setFetchingData] = useState(false);
@@ -88,6 +95,10 @@ function Cashflow() {
     } catch (err) {
       if (!err?.response?.data?.is_success) {
         message.error(err?.response?.data?.message || "Failed to get cashflow");
+
+        if (err?.response?.data?.code === 401) {
+          navigate("/login");
+        }
       } else {
         message.error("Error get cashflow:", err);
       }
@@ -107,6 +118,10 @@ function Cashflow() {
     } catch (err) {
       if (!err?.response?.data?.is_success) {
         message.error(err?.response?.data?.message || "Failed to get period");
+
+        if (err?.response?.data?.code === 401) {
+          navigate("/login");
+        }
       } else {
         message.error("Error get period:", err);
       }
@@ -180,7 +195,13 @@ function Cashflow() {
       <Typography.Text strong style={{ fontSize: "1.2em" }}>
         Total
       </Typography.Text>
-      <div style={{ display: "flex", gap: "1em" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: xs ? "column" : "row",
+          gap: "1em",
+        }}
+      >
         <InputCurrency
           label="Income: "
           value={total.income}
