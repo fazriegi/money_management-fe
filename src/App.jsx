@@ -24,6 +24,7 @@ import Login from "src/pages/Login";
 import Cashflow from "src//module/cashflow/Cashflow";
 import { CashflowProvider } from "src/context/CashflowContext";
 import Home from "src/pages/Home";
+import BalanceSheet from "src/module/balance-sheet/BalanceSheet";
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -58,6 +59,11 @@ function MainLayout({ children }) {
       key: "2",
       label: "Cashflow",
       onClick: () => navigate("/cashflow"),
+    },
+    {
+      key: "3",
+      label: "Balance Sheet",
+      onClick: () => navigate("/balance-sheet"),
     },
   ];
 
@@ -243,6 +249,7 @@ function App() {
                 }
               />
               <Route path="/" element={<Home />} />
+              <Route path="/balance-sheet" element={<BalanceSheet />} />
             </Routes>
           </div>
         </MainLayout>
